@@ -9,7 +9,7 @@ export interface MonacoEditorProps {
 }
 export const MonacoEditor = Shade<MonacoEditorProps>({
   constructed: ({ element, props }) => {
-    monaco.languages.json.jsonDefaults.diagnosticsOptions.enableSchemaRequest = true
+    ;(monaco.languages.json.jsonDefaults.diagnosticsOptions as any).enableSchemaRequest = true
     const editor = monaco.editor.create(element.firstChild as HTMLElement, props.options)
     editor.setValue(props.value || '')
     props.onchange &&

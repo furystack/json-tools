@@ -1,7 +1,7 @@
 import { createComponent, Shade, Router } from '@furystack/shades'
 import { User } from 'common'
 import { SessionService, sessionState } from '../services/session'
-import { Init, Offline, Login } from '../pages'
+import { Init, Login } from '../pages'
 import { Register } from '../pages/register'
 import { ComparePage } from '../pages/compare'
 import { Home } from '../pages/home'
@@ -30,9 +30,10 @@ export const Body = Shade<
   },
   render: ({ getState }) => {
     const { sessionState: state } = getState()
-    if (state === 'offline') {
-      return <Offline />
-    }
+    // ToDO: Wire back after backend service
+    // if (state === 'offline') {
+    //   return <Offline />
+    // }
 
     if (state === 'initializing') {
       return <Init />
