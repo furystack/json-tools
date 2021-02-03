@@ -8,8 +8,8 @@ export const ValidatePage = Shade<unknown, { value: string }>({
     <div
       style={{
         position: 'fixed',
-        top: '50px',
-        height: 'calc(100% - 50px)',
+        top: '65px',
+        height: 'calc(100% - 65px)',
         width: '100%',
       }}>
       <MonacoEditor

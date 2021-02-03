@@ -8,8 +8,8 @@ export const ComparePage = Shade<unknown, { originalValue: string; modifiedValue
     <div
       style={{
         position: 'fixed',
-        top: '50px',
-        height: 'calc(100% - 50px)',
+        top: '63px',
+        height: 'calc(100% - 63px)',
         width: '100%',
       }}>
       <MonacoDiffEditor

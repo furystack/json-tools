@@ -1,15 +1,13 @@
 import { createComponent, RouteLink, Shade } from '@furystack/shades'
-import { Button, ThemeProviderService } from '@furystack/shades-common-components'
+import { Button } from '@furystack/shades-common-components'
 
 export const Home = Shade({
   shadowDomName: 'shade-home',
-  render: ({ injector }) => {
-    const style = injector.getInstance(ThemeProviderService).theme.getValue()
+  render: () => {
     return (
       <div
         style={{
           padding: '4em',
-          color: style.text.primary,
         }}>
         <h1>JSON Tools</h1>
         <h2>Compare</h2>
@@ -23,11 +21,9 @@ export const Home = Shade({
 
         <h2>Validate</h2>
         <p>
-          Validate JSON data against a specified JSON Schema with a "$schema" field
+          Validate JSON data against a specified JSON Schema with a "$schema" field and URL
           <RouteLink href="/validate">
-            <Button disabled variant="outlined">
-              Go
-            </Button>
+            <Button variant="outlined">Go</Button>
           </RouteLink>
         </p>
       </div>

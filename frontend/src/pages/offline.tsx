@@ -1,9 +1,11 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 import { environmentOptions } from '..'
 
 export const Offline = Shade({
   shadowDomName: 'shade-offline',
-  render: () => {
+  render: ({ injector }) => {
+    const style = injector.getInstance(ThemeProviderService).theme.getValue()
     return (
       <div
         style={{
@@ -13,6 +15,7 @@ export const Offline = Shade({
           alignItems: 'center',
           justifyContent: 'center',
           padding: '0 100px',
+          color: style.text.primary,
         }}>
         <div
           id="offline"

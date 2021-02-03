@@ -2,6 +2,7 @@ import '@furystack/utils'
 import { Shade, createComponent } from '@furystack/shades'
 
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import { defaultLightTheme, ThemeProviderService } from '@furystack/shades-common-components'
 
 export const orderFields = (obj: unknown): any => {
   if (obj && typeof obj === 'object') {
@@ -31,7 +32,7 @@ export interface MonacoDiffEditorProps {
   onModifiedChange?: (value: string) => void
 }
 export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
-  constructed: ({ element, props }) => {
+  constructed: ({ element, props, injector }) => {
     const editor = monaco.editor.createDiffEditor(element.firstChild as HTMLElement, props.options)
     const original = monaco.editor.createModel(props.originalValue, 'json')
     const modified = monaco.editor.createModel(props.modifiedValue, 'json')
@@ -58,6 +59,18 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
     }
     editor.getOriginalEditor().addAction(orderFieldsAction)
     editor.getModifiedEditor().addAction(orderFieldsAction)
+    const themeChange = injector.getInstance(ThemeProviderService).theme.subscribe((t) => {
+      if (t === defaultLightTheme) {
+        editor.updateOptions({ theme: 'vs-light' } as any)
+        editor.getOriginalEditor().updateOptions({ theme: 'vs-light' })
+        editor.getModifiedEditor().updateOptions({ theme: 'vs-light' })
+      } else {
+        editor.updateOptions({ theme: 'vs-dark' } as any)
+        editor.getOriginalEditor().updateOptions({ theme: 'vs-dark' })
+        editor.getModifiedEditor().updateOptions({ theme: 'vs-dark' })
+      }
+    }, true)
+    return () => themeChange.dispose()
   },
   render: () => {
     return <div style={{ width: '100%', height: '100%' }}> </div>

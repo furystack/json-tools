@@ -1,7 +1,7 @@
 import { createComponent, Shade, Router } from '@furystack/shades'
 import { User } from 'common'
 import { SessionService, sessionState } from '../services/session'
-import { Init, Login } from '../pages'
+import { Login } from '../pages'
 import { Register } from '../pages/register'
 import { ComparePage } from '../pages/compare'
 import { Home } from '../pages/home'
@@ -35,9 +35,9 @@ export const Body = Shade<
     //   return <Offline />
     // }
 
-    if (state === 'initializing') {
-      return <Init />
-    }
+    // if (state !== 'authenticated' && state !== 'unauthenticated') {
+    //   return <Init />
+    // }
     return (
       <div id="Body">
         <Router
