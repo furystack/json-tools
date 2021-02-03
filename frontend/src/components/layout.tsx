@@ -22,7 +22,13 @@ export const Layout = Shade({
           overflow: 'hidden',
         }}
         className="eee">
-        <Header title="🧩 FuryStack Boilerplate" links={[]} />
+        <Header
+          title="{} json-tools  "
+          links={[
+            { name: 'Compare', url: '/compare' },
+            { name: 'Validate', url: '/validate' },
+          ]}
+        />
         <Body style={{ width: '100%', height: '100%', overflow: 'auto' }} />
       </div>
     )

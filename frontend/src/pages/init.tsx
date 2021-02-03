@@ -7,6 +7,7 @@ export const Init = Shade({
     <div
       style={{
         display: 'flex',
+        marginTop: '150px',
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',

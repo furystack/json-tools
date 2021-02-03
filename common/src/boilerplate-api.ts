@@ -11,5 +11,6 @@ export interface BoilerplateApi extends RestApi {
     '/login': RequestAction<{ result: User; body: { username: string; password: string } }>
     '/logout': RequestAction<{}>
     '/testPostBody': RequestAction<{ body: { value: string }; result: { bodyValue: string } }>
+    '/register': RequestAction<{ result: User; body: { username: string; password: string } }>
   }
 }

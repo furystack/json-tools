@@ -47,6 +47,18 @@ export class SessionService {
     })
   }
 
+  public async register(username: string, password: string): Promise<void> {
+    await usingAsync(this.operation(), async () => {
+      try {
+        await sleepAsync(2000)
+        await this.api.call({ method: 'POST', action: '/register', body: { username, password } })
+      } catch (error) {
+        const errorResponse = await error.response.json()
+        this.loginError.setValue(errorResponse.message)
+      }
+    })
+  }
+
   public async logout(): Promise<void> {
     await usingAsync(this.operation(), async () => {
       this.api.call({ method: 'POST', action: '/logout', body: undefined })

@@ -2,6 +2,7 @@ import { BoilerplateApi, User, Session } from 'common'
 import { JsonResult } from '@furystack/rest'
 import { GetCurrentUser, IsAuthenticated, LoginAction, LogoutAction } from '@furystack/rest-service'
 import { injector } from './config'
+import { RegisterAction } from './actions/register-action'
 
 injector
   .disposeOnProcessExit()
@@ -27,6 +28,7 @@ injector
       POST: {
         '/login': LoginAction,
         '/logout': LogoutAction,
+        '/register': RegisterAction,
         '/testPostBody': async (options) => {
           const body = await options.getBody()
           return JsonResult({ bodyValue: body.value })

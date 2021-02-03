@@ -2,8 +2,11 @@ import { Shade, createComponent, LocationService } from '@furystack/shades'
 import { SessionService } from '../services/session'
 import { Button, Input, Loader, Paper } from '@furystack/shades-common-components'
 
-export const Login = Shade<{}, { username: string; password: string; error: string; isOperationInProgress: boolean }>({
-  shadowDomName: 'shade-login',
+export const Register = Shade<
+  {},
+  { username: string; password: string; error: string; isOperationInProgress: boolean }
+>({
+  shadowDomName: 'shade-register',
   getInitialState: () => ({
     username: '',
     password: '',
@@ -34,17 +37,19 @@ export const Login = Shade<{}, { username: string; password: string; error: stri
           alignItems: 'center',
           justifyContent: 'center',
           padding: '0 100px',
-          marginTop: '100px',
+          marginTop: '120px',
         }}>
         <form
-          className="login-form"
-          onsubmit={(ev) => {
+          className="register-form"
+          onsubmit={async (ev) => {
             ev.preventDefault()
             const state = getState()
-            sessinService.login(state.username, state.password)
+            await sessinService.register(state.username, state.password)
+            history.pushState('', '', '/')
+            injector.getInstance(LocationService).updateState()
           }}>
           <Paper>
-            <h2>Login</h2>
+            <h2>Register</h2>
             <Input
               labelTitle="User name"
               required
@@ -77,6 +82,22 @@ export const Login = Shade<{}, { username: string; password: string; error: stri
                 )
               }}
             />
+            <Input
+              labelTitle="Confirm Password"
+              required
+              disabled={getState().isOperationInProgress}
+              placeholder="The password for the user"
+              value={password}
+              type="password"
+              onchange={(ev) => {
+                updateState(
+                  {
+                    password: (ev.target as HTMLInputElement).value,
+                  },
+                  true,
+                )
+              }}
+            />
             <div
               style={{
                 display: 'flex',
@@ -84,17 +105,9 @@ export const Login = Shade<{}, { username: string; password: string; error: stri
                 alignItems: 'center',
                 flexDirection: 'row',
                 padding: '1em 0',
+                marginTop: '100px',
               }}>
               {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
-              <Button
-                type="button"
-                onclick={(ev) => {
-                  ev.preventDefault()
-                  history.pushState('', '', '/register')
-                  injector.getInstance(LocationService).updateState()
-                }}>
-                Register
-              </Button>
               <Button
                 variant="contained"
                 className="login-button"
