@@ -1,0 +1,25 @@
+{
+  "name": "service",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "GPL-2.0-only",
+  "private": true,
+  "scripts": {
+    "start": "yarn build && node ./dist/service.js",
+    "seed": "yarn build && node ./dist/seed.js",
+    "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
+    "build": "tsc -b"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.22"
+  },
+  "dependencies": {
+    "@furystack/core": "^9.1.20",
+    "@furystack/filesystem-store": "^1.1.20",
+    "@furystack/inject": "^4.0.48",
+    "@furystack/logging": "^2.0.55",
+    "@furystack/repository": "^4.0.10",
+    "@furystack/rest-service": "^2.3.6",
+    "tslib": "^2.1.0"
+  }
+}
