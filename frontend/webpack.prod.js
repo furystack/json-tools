@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-// const path = require('path')
+const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const { RelativeCiAgentWebpackPlugin } = require('@relative-ci/agent')
-// const CopyPlugin = require('copy-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -54,10 +54,7 @@ module.exports = merge(common, {
         minifyURLs: true,
       },
     }),
-    // new CopyPlugin([
-    //   { from: path.resolve(`${__dirname}/_redirects`), to: path.resolve(`${__dirname}/build`) },
-    //   { from: path.resolve(`${__dirname}/web.config`), to: path.resolve(`${__dirname}/build`) },
-    // ]),
+    new CopyPlugin({ patterns: [{ from: 'static/_redirects', to: '' }] }),
     // new RelativeCiAgentWebpackPlugin({
     //   enabled: process.env.GITHUB_ACTIONS, // Run this only under GitHub Actions
     // }),
