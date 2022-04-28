@@ -1,15 +1,14 @@
-import { BoilerplateApi, User, Session } from 'common'
-import { JsonResult } from '@furystack/rest'
+import { BoilerplateApi } from 'common'
+import '@furystack/security'
+import { JsonResult } from '@furystack/rest-service'
 import { GetCurrentUser, IsAuthenticated, LoginAction, LogoutAction } from '@furystack/rest-service'
 import { injector } from './config'
 import { RegisterAction } from './actions/register-action'
 
 injector
   .disposeOnProcessExit()
-  .useHttpAuthentication({
-    getUserStore: (sm) => sm.getStoreFor<User & { password: string }>(User as any),
-    getSessionStore: (sm) => sm.getStoreFor(Session),
-  })
+  .useHttpAuthentication()
+  .usePasswordPolicy()
   .useRestService<BoilerplateApi>({
     root: 'api',
     port: parseInt(process.env.APP_SERVICE_PORT as string, 10) || 9090,
@@ -22,8 +21,7 @@ injector
       GET: {
         '/currentUser': GetCurrentUser,
         '/isAuthenticated': IsAuthenticated,
-        '/testQuery': async (options) => JsonResult({ param1Value: options.getQuery().param1 }),
-        '/testUrlParams/:urlParam': async (options) => JsonResult({ urlParamValue: options.getUrlParams().urlParam }),
+
       },
       POST: {
         '/login': LoginAction,

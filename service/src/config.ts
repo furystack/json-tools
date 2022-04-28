@@ -1,11 +1,12 @@
 import { join } from 'path'
-import { InMemoryStore } from '@furystack/core'
+import { InMemoryStore, User } from '@furystack/core'
 import { FileSystemStore } from '@furystack/filesystem-store'
 import { Injector } from '@furystack/inject'
 import { VerboseConsoleLogger } from '@furystack/logging'
-import { DataSetSettings, AuthorizationResult } from '@furystack/repository'
+import { AuthorizationResult } from '@furystack/repository'
 import '@furystack/repository/dist/injector-extension'
-import { User, Session } from 'common'
+import { DefaultSession } from '@furystack/rest-service'
+import { PasswordCredential } from '@furystack/security'
 
 export const authorizedOnly = async (options: { injector: Injector }): Promise<AuthorizationResult> => {
   const isAllowed = await options.injector.isAuthenticated()
@@ -17,7 +18,7 @@ export const authorizedOnly = async (options: { injector: Injector }): Promise<A
       }
 }
 
-export const authorizedDataSet: Partial<DataSetSettings<any, any>> = {
+export const authorizedDataSet = {
   authorizeAdd: authorizedOnly,
   authorizeGet: authorizedOnly,
   authorizeRemove: authorizedOnly,
@@ -31,7 +32,7 @@ injector
   .setupStores((stores) =>
     stores
       .addStore(
-        new FileSystemStore<User>({
+        new FileSystemStore({
           model: User,
           primaryKey: 'username',
           tickMs: 30 * 1000,
@@ -39,11 +40,17 @@ injector
         }),
       )
       .addStore(
-        new InMemoryStore<Session>({ model: Session, primaryKey: 'sessionId' }),
-      ),
+        new FileSystemStore({
+          model: PasswordCredential,
+          primaryKey: 'userName',
+          tickMs: 30 * 1000,
+          fileName: join(__filename, '..', '..', 'credentials.json'),
+        }),
+      )
+      .addStore(new InMemoryStore({ model: DefaultSession, primaryKey: 'sessionId' })),
   )
   .setupRepository((repo) =>
-    repo.createDataSet(User, {
+    repo.createDataSet<User, 'username'>(User, 'username', {
       ...authorizedDataSet,
     }),
   )

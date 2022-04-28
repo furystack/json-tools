@@ -5,5 +5,8 @@
   "eslint.validate": [
     "typescript",
     "typescriptreact"
-  ]
+  ],
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

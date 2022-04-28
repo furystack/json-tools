@@ -1,5 +1,5 @@
 import { createComponent, Shade, Router } from '@furystack/shades'
-import { User } from 'common'
+import { User } from '@furystack/core'
 import { SessionService, sessionState } from '../services/session'
 import { Login } from '../pages'
 import { Register } from '../pages/register'

@@ -1,16 +1,15 @@
-import { RestApi, RequestAction } from '@furystack/rest'
-import { User } from './models'
+import { RestApi } from '@furystack/rest'
+import { User } from '@furystack/core'
+
 export interface BoilerplateApi extends RestApi {
   GET: {
-    '/isAuthenticated': RequestAction<{ result: { isAuthenticated: boolean } }>
-    '/currentUser': RequestAction<{ result: User }>
-    '/testQuery': RequestAction<{ query: { param1: string }; result: { param1Value: string } }>
-    '/testUrlParams/:urlParam': RequestAction<{ urlParams: { urlParam: string }; result: { urlParamValue: string } }>
+    '/isAuthenticated': { result: { isAuthenticated: boolean } }
+    '/currentUser': { result: User }
   }
   POST: {
-    '/login': RequestAction<{ result: User; body: { username: string; password: string } }>
-    '/logout': RequestAction<{}>
-    '/testPostBody': RequestAction<{ body: { value: string }; result: { bodyValue: string } }>
-    '/register': RequestAction<{ result: User; body: { username: string; password: string } }>
+    '/login': { result: User; body: { username: string; password: string } }
+    '/logout': { result: unknown }
+    '/testPostBody': { body: { value: string }; result: { bodyValue: string } }
+    '/register': { result: User; body: { username: string; password: string } }
   }
 }
