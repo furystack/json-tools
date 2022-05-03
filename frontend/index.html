@@ -5,6 +5,13 @@
     <title>FuryStack JSON Tools</title>
   </head>
   <style>
+    html,
+    head {
+      margin: 0;
+      padding: 0;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+
     @keyframes glow {
       from {
         filter: brightness(0.9);
@@ -12,6 +19,29 @@
       to {
         filter: brightness(1);
       }
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: rgba(128, 128, 128, 0.03);
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: rgba(128, 128, 128, 0.4);
+      border-radius: 2px;
+      box-shadow: 1px 1px 3px -1px rgba(192, 192, 192, 0.3) inset, 1px 1px 3px 0px rgba(0, 0, 0, 0.15);
+      /* box-shadow: 1px 1px 3px 5px rgba(192, 192, 192, 0.5) inset; */
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(128, 128, 128, 0.6);
     }
   </style>
   <body>
