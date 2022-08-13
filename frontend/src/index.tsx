@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
-import { VerboseConsoleLogger } from '@furystack/logging'
+import { VerboseConsoleLogger, useLogging, getLogger } from '@furystack/logging'
 import { Injector } from '@furystack/inject'
 import { Layout } from './components/layout'
 
@@ -14,9 +14,9 @@ export const environmentOptions = {
   serviceUrl: process.env.SERVICE_URL as string,
 }
 
-shadeInjector.useLogging(VerboseConsoleLogger)
+useLogging(shadeInjector, VerboseConsoleLogger)
 
-shadeInjector.logger.withScope('Startup').verbose({
+getLogger(shadeInjector).withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',
   data: { environmentOptions },
 })

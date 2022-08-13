@@ -9,6 +9,7 @@ export interface MonacoEditorProps {
   onchange?: (value: string) => void
 }
 export const MonacoEditor = Shade<MonacoEditorProps>({
+  shadowDomName: 'shade-monaco-editor',
   constructed: ({ element, props, injector }) => {
     ;(monaco.languages.json.jsonDefaults.diagnosticsOptions as any).enableSchemaRequest = true
     const editor = monaco.editor.create(element.firstChild as HTMLElement, props.options)
