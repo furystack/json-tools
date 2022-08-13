@@ -32,6 +32,7 @@ export interface MonacoDiffEditorProps {
   onModifiedChange?: (value: string) => void
 }
 export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
+  shadowDomName: 'shade-monaco-diff-editor',
   constructed: ({ element, props, injector }) => {
     const editor = monaco.editor.createDiffEditor(element.firstChild as HTMLElement, props.options)
     const original = monaco.editor.createModel(props.originalValue, 'json')
