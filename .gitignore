@@ -68,3 +68,11 @@ service/data.sqlite
 frontend/cypress/videos
 frontend/cypress/screenshots
 frontend/testresults
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
