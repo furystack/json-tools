@@ -23,7 +23,7 @@ export const Layout = Shade({
           margin: '0',
           backgroundColor: injector.getInstance(ThemeProviderService).theme.background.paper,
         }}>
-        <Header title="JSON-Tools" links={[]} />
+        <Header title="JSON-Tools" />
         <Body style={{ width: '100%', height: '100%', overflow: 'auto' }} />
       </div>
     )
