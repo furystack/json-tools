@@ -1,22 +1,48 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
-import type { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
+import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { MonacoEditor } from '../components/monaco/monaco-editor.js'
+import { JsonSchemaSelector } from '../components/json-schema-selector.js'
+import { MonacoModelProvider } from '../services/monaco-model-provider.js'
 
 export const ValidatePage = Shade({
   shadowDomName: 'shade-validate-page',
   render: ({ injector, useObservable, element }) => {
     const locationService = injector.getInstance(LocationService)
+    const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const [original, setOriginal] = useObservable('value', locationService.useSearchParam('value', ''), {
+    const [value, setValue] = useObservable('value', locationService.useSearchParam('value', ''), {
       onChange: (newValue) => {
-        const originalEditor = (
-          element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
-        )?.getOriginalEditor()
-        const pos = originalEditor.getPosition()
-        originalEditor.setValue(newValue)
-        pos && originalEditor.setPosition(pos)
+        const editorInstance = element.querySelector<any>('monaco-editor')
+          ?.editorInstance as editor.IStandaloneCodeEditor
+        const pos = editorInstance.getPosition()
+        editorInstance.setValue(newValue)
+        pos && editorInstance.setPosition(pos)
       },
     })
+
+    const [jsonSchema, setJsonSchema] = useObservable('schema', locationService.useSearchParam('jsonSchema', ''), {
+      onChange: (newValue) => {
+        const editorInstance = element.querySelector<any>('monaco-editor')
+          ?.editorInstance as editor.IStandaloneCodeEditor
+        const oldModel = editorInstance.getModel()!
+
+        const uri = modelProvider.getModelUriForEntityType({
+          schemaName: JSON.stringify(newValue).replace(/[^a-zA-Z0-9]/g, ''),
+          jsonSchema: JSON.parse(newValue),
+        })
+
+        editorInstance.setModel(editor.createModel(oldModel.getValue(), 'json', uri))
+        oldModel.dispose()
+      },
+    })
+
+    const uri = jsonSchema
+      ? modelProvider.getModelUriForEntityType({
+          schemaName: JSON.stringify(jsonSchema).replace(/[^a-zA-Z0-9]/g, ''),
+          jsonSchema: JSON.parse(jsonSchema),
+        })
+      : undefined
+
     return (
       <div
         style={{
@@ -24,16 +50,22 @@ export const ValidatePage = Shade({
           top: '65px',
           height: 'calc(100% - 65px)',
           width: '100%',
-        }}
-      >
+        }}>
         <MonacoEditor
-          value={original}
-          onValueChange={(newValue) => setOriginal(newValue)}
+          value={value}
+          onValueChange={(newValue) => setValue(newValue)}
+          modelUri={uri}
           options={{
             language: 'json',
             automaticLayout: true,
             readOnly: false,
             theme: 'vs-dark',
+          }}
+        />
+        <JsonSchemaSelector
+          schema={jsonSchema}
+          onSchemaChange={(schema) => {
+            setJsonSchema(schema)
           }}
         />
       </div>

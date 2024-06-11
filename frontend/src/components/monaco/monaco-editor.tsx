@@ -24,17 +24,18 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
       getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'vs-dark' : 'vs-light',
     )
 
-    const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })
+    const [editorInstance] = useState(
+      'editorInstance',
+      editor.create(element as HTMLElement, { ...props.options, theme }),
+    )
 
-    editorInstance.setValue(props.value || '')
-    props.onValueChange &&
-      editorInstance.onKeyUp(() => {
-        props.onValueChange?.(editorInstance.getValue())
-      })
+    editorInstance.onDidChangeModelContent(() => {
+      props.onValueChange?.(editorInstance.getValue())
+    })
 
     if (props.modelUri) {
       useDisposable('monacoModelUri', () => {
-        const model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
+        const model = editor.createModel(props.value || '', 'json', props.modelUri)
         editorInstance.setModel(model)
         return {
           dispose: () => {
@@ -42,6 +43,8 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
           },
         }
       })
+    } else {
+      editorInstance.setValue(props.value || '')
     }
 
     editorInstance.addAction(orderFieldsAction)

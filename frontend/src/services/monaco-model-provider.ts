@@ -12,6 +12,9 @@ export class MonacoModelProvider {
     const modelUri = Uri.parse(`furystack://json-tools/model-schemas-${schemaName}.json`)
     languages.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
+      enableSchemaRequest: true,
+      schemaRequest: 'warning',
+      schemaValidation: 'error',
       schemas: [
         ...(languages.json.jsonDefaults.diagnosticsOptions.schemas || []),
         {
