@@ -3,32 +3,25 @@ import { Uri, languages } from 'monaco-editor/esm/vs/editor/editor.api.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class MonacoModelProvider {
-  private schemaUriCache = new Map<any, Map<string, Uri>>()
+  private nameUriCache = new Map<string, Uri>()
+
   public getModelUriForEntityType({ schemaName, jsonSchema }: { schemaName: string; jsonSchema: any }) {
-    const nameUriCache = this.schemaUriCache.get(jsonSchema) || new Map<string, Uri>()
-
-    if (!this.schemaUriCache.has(jsonSchema)) {
-      this.schemaUriCache.set(jsonSchema, nameUriCache)
+    if (this.nameUriCache.has(schemaName)) {
+      return this.nameUriCache.get(schemaName) as Uri
     }
-
-    if (nameUriCache.has(schemaName)) {
-      return nameUriCache.get(schemaName) as Uri
-    }
-
-    const schemaUriString = `furystack://json-tools/model-schemas-${schemaName}.json`
-    const modelUri = Uri.parse(schemaUriString)
+    const modelUri = Uri.parse(`furystack://json-tools/model-schemas-${schemaName}.json`)
     languages.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemas: [
         ...(languages.json.jsonDefaults.diagnosticsOptions.schemas || []),
         {
-          uri: schemaUriString,
+          uri: `furystack://json-tools/model-schemas-${schemaName}.json`,
           fileMatch: [modelUri.toString()],
           schema: { ...jsonSchema },
         },
       ],
     })
-    nameUriCache.set(schemaName, modelUri)
+    this.nameUriCache.set(schemaName, modelUri)
     return modelUri
   }
 }
