@@ -6,7 +6,7 @@ import { MonacoModelProvider } from '../services/monaco-model-provider.js'
 
 export const ValidatePage = Shade({
   shadowDomName: 'shade-validate-page',
-  render: ({ injector, useObservable, element }) => {
+  render: ({ injector, useObservable, element, useSearchState }) => {
     const locationService = injector.getInstance(LocationService)
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
@@ -20,7 +20,9 @@ export const ValidatePage = Shade({
       },
     })
 
-    const [jsonSchema, setJsonSchema] = useObservable('schema', locationService.useSearchParam('jsonSchema', ''), {
+    const [jsonSchema] = useSearchState('jsonSchema', '')
+
+    const [, setJsonSchema] = useObservable('schema', locationService.useSearchParam('jsonSchema', ''), {
       onChange: (newValue) => {
         const editorInstance = element.querySelector<any>('monaco-editor')
           ?.editorInstance as editor.IStandaloneCodeEditor
