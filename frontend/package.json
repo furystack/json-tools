@@ -24,6 +24,6 @@
     "@furystack/shades-common-components": "^8.2.2",
     "@furystack/utils": "^7.0.2",
     "@types/node": "^20.14.2",
-    "common": "workspace:^"
+    "monaco-editor": "^0.49.0"
   }
 }

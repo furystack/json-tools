@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 export const environmentOptions = {
   // nodeEnv: process.env.NODE_ENV as 'development' | 'production',
   // debug: Boolean(process.env.DEBUG),

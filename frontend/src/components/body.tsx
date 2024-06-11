@@ -1,33 +1,20 @@
 import { createComponent, Shade, Router } from '@furystack/shades'
-import { SessionService } from '../services/session.js'
-import { ButtonsDemo, Init, HelloWorld, Offline, Login } from '../pages/index.js'
+import { ComparePage } from '../pages/compare.js'
+import { ValidatePage } from '../pages/validate.js'
+import { Home } from '../pages/home.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
-  render: ({ injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
-    const [sessionState] = useObservable('sessionState', session.state)
+  render: () => {
     return (
       <div id="Body">
-        {(() => {
-          switch (sessionState) {
-            case 'authenticated':
-              return (
-                <Router
-                  routes={[
-                    { url: '/buttons', routingOptions: { end: false }, component: () => <ButtonsDemo /> },
-                    { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
-                  ]}
-                ></Router>
-              )
-            case 'offline':
-              return <Offline />
-            case 'unauthenticated':
-              return <Login />
-            default:
-              return <Init />
-          }
-        })()}
+        <Router
+          routes={[
+            { url: '/compare', routingOptions: { end: false }, component: () => <ComparePage /> },
+            { url: '/validate', routingOptions: { end: false }, component: () => <ValidatePage /> },
+            { url: '/', routingOptions: { end: false }, component: () => <Home /> },
+          ]}
+        />
       </div>
     )
   },

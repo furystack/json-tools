@@ -54,6 +54,5 @@
     "pretty": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
-  "references": [{ "path": "../common" }]
+  "include": ["src"]
 }

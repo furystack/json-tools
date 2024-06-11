@@ -1,0 +1,85 @@
+import { Shade } from '@furystack/shades'
+import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
+import type { Uri } from 'monaco-editor'
+import 'monaco-editor/esm/vs/editor/editor.main'
+
+import './worker-config.js'
+import { ThemeProviderService, getCssVariable } from '@furystack/shades-common-components'
+import { darkTheme } from '../../themes/dark.js'
+import { orderFieldsAction } from './order-fields.js'
+
+export interface MonacoEditorProps {
+  options: editor.IStandaloneEditorConstructionOptions
+  originalValue?: string
+  onOriginalValueChange?: (value: string) => void
+  modifiedValue?: string
+  onModifiedValueChange?: (value: string) => void
+  originalModelUri?: Uri
+  modifiedModelUri?: Uri
+}
+export const MonacoDiffEditor = Shade<MonacoEditorProps>({
+  shadowDomName: 'monaco-diff-editor',
+  constructed: ({ element, props, injector, useState, useDisposable }) => {
+    const themeProvider = injector.getInstance(ThemeProviderService)
+
+    const [theme] = useState<'vs-light' | 'vs-dark'>(
+      'theme',
+      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'vs-dark' : 'vs-light',
+    )
+
+    const editorInstance = editor.createDiffEditor(element as HTMLElement, { ...props.options, theme })
+
+    const originalModel = editor.createModel(props.originalValue || '', 'json')
+    const modifiedModel = editor.createModel(props.modifiedValue || '', 'json')
+
+    editorInstance.setModel({ original: originalModel, modified: modifiedModel })
+
+    props.onOriginalValueChange &&
+      editorInstance.getOriginalEditor().onKeyUp(() => {
+        props.onOriginalValueChange?.(editorInstance.getOriginalEditor().getValue())
+      })
+
+    if (props.originalModelUri) {
+      useDisposable('monacoOriginalModelUri', () => {
+        const model = editor.createModel(editorInstance.getOriginalEditor().getValue(), 'json', props.originalModelUri)
+        editorInstance.getOriginalEditor().setModel(model)
+        return {
+          dispose: () => {
+            model.dispose()
+          },
+        }
+      })
+    }
+
+    props.onModifiedValueChange &&
+      editorInstance.getModifiedEditor().onKeyUp(() => {
+        props.onModifiedValueChange?.(editorInstance.getModifiedEditor().getValue())
+      })
+
+    if (props.modifiedModelUri) {
+      useDisposable('monacoModifiedModelUri', () => {
+        const model = editor.createModel(editorInstance.getModifiedEditor().getValue(), 'json', props.modifiedModelUri)
+        editorInstance.getModifiedEditor().setModel(model)
+        return {
+          dispose: () => {
+            model.dispose()
+          },
+        }
+      })
+    }
+
+    editorInstance.addAction(orderFieldsAction)
+    editorInstance.getOriginalEditor().addAction(orderFieldsAction)
+
+    Object.assign(element, { editorInstance })
+
+    return () => editorInstance.dispose()
+  },
+  render: ({ element }) => {
+    element.style.display = 'block'
+    element.style.height = 'calc(100% - 96px)'
+    element.style.width = '100%'
+    element.style.position = 'relative'
+    return null
+  },
+})
