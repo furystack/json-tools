@@ -8,7 +8,8 @@ export const Home = Shade({
       <div
         style={{
           padding: '4em',
-        }}>
+        }}
+      >
         <h2>Compare</h2>
         <p>
           Show diff in a two-pane view to compare JSON data with a possibility to order the object fields from the

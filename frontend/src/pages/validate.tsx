@@ -24,7 +24,8 @@ export const ValidatePage = Shade({
           top: '65px',
           height: 'calc(100% - 65px)',
           width: '100%',
-        }}>
+        }}
+      >
         <MonacoEditor
           value={original}
           onValueChange={(newValue) => setOriginal(newValue)}

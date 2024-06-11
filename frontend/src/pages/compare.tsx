@@ -37,7 +37,8 @@ export const ComparePage = Shade({
           height: 'calc(100% - 63px)',
           width: '100%',
           backgroundColor: 'darkgray',
-        }}>
+        }}
+      >
         <MonacoDiffEditor
           originalValue={original}
           modifiedValue={modified}
