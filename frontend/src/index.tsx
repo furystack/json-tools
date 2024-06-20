@@ -6,8 +6,7 @@ import { Layout } from './components/layout.js'
 import { environmentOptions } from './environment-options.js'
 import { darkTheme } from './themes/dark.js'
 import { ThemeProviderService } from '@furystack/shades-common-components'
-import type { FlateError} from 'fflate';
-import { FlateErrorCode, gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
+import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
 import { orderFields } from './components/monaco/order-fields.js'
 
 const shadeInjector = new Injector()
