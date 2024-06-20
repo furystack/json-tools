@@ -50,8 +50,8 @@ export const ValidatePage = Shade({
       <div
         style={{
           position: 'fixed',
-          top: '65px',
-          height: 'calc(100% - 10px)',
+          top: '46px',
+          height: '100%',
           width: '100%',
         }}>
         <MonacoEditor
@@ -68,7 +68,10 @@ export const ValidatePage = Shade({
 
         <div
           style={{
-            display: 'flex',
+            position: 'fixed',
+            bottom: '0',
+            right: '0',
+            zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
           }}>

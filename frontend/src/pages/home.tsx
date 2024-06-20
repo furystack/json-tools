@@ -7,9 +7,8 @@ export const Home = Shade({
     return (
       <Paper
         style={{
-          paddingTop: '4em',
-        }}
-      >
+          paddingTop: '2em',
+        }}>
         <h3>Compare</h3>
         <p>
           Show diff in a two-pane view to compare JSON data with a possibility to order the object fields from the

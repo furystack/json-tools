@@ -83,9 +83,7 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
   },
   render: ({ element }) => {
     element.style.display = 'block'
-    element.style.height = 'calc(100% - 96px)'
-    element.style.width = '100%'
-    element.style.position = 'relative'
+    element.style.height = 'calc(100% - 46px)'
     return null
   },
 })

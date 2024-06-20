@@ -34,8 +34,8 @@ export const ComparePage = Shade({
       <div
         style={{
           position: 'fixed',
-          top: '63px',
-          height: 'calc(100% - 10px)',
+          top: '46px',
+          height: '100%',
           width: '100%',
         }}>
         <MonacoDiffEditor
@@ -54,7 +54,10 @@ export const ComparePage = Shade({
         />
         <div
           style={{
-            display: 'flex',
+            position: 'fixed',
+            bottom: '0',
+            right: '0',
+            zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
           }}>
