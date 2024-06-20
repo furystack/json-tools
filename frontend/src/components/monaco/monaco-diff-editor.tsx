@@ -7,6 +7,7 @@ import './worker-config.js'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { darkTheme } from '../../themes/dark.js'
 import { orderFieldsAction } from './order-fields.js'
+import { ScrollService } from '../../services/scroll-service.js'
 
 export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
@@ -25,6 +26,8 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
     const editorInstance = editor.createDiffEditor(element as HTMLElement, {
       ...props.options,
       theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+      smoothScrolling: true,
+      scrollBeyondLastLine: false,
     })
 
     useDisposable('themeChange', () =>
@@ -77,13 +80,25 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
     editorInstance.addAction(orderFieldsAction)
     editorInstance.getOriginalEditor().addAction(orderFieldsAction)
 
+    editorInstance.getOriginalEditor().onDidScrollChange(() => {
+      injector
+        .getInstance(ScrollService)
+        .emit('onScroll', { top: editorInstance.getOriginalEditor().getScrollTop() === 0 })
+    })
+
+    editorInstance.getModifiedEditor().onDidScrollChange(() => {
+      injector
+        .getInstance(ScrollService)
+        .emit('onScroll', { top: editorInstance.getModifiedEditor().getScrollTop() === 0 })
+    })
+
     Object.assign(element, { editorInstance })
 
     return () => editorInstance.dispose()
   },
   render: ({ element }) => {
     element.style.display = 'block'
-    element.style.height = 'calc(100% - 46px)'
+    element.style.height = '100%'
     return null
   },
 })

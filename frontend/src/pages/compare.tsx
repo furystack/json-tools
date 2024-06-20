@@ -34,7 +34,6 @@ export const ComparePage = Shade({
       <div
         style={{
           position: 'fixed',
-          top: '46px',
           height: '100%',
           width: '100%',
         }}>

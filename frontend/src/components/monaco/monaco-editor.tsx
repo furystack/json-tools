@@ -7,6 +7,7 @@ import './worker-config'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { darkTheme } from '../../themes/dark.js'
 import { orderFieldsAction } from './order-fields.js'
+import { ScrollService } from '../../services/scroll-service.js'
 
 export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
@@ -24,8 +25,14 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
       editor.create(element as HTMLElement, {
         ...props.options,
         theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+        smoothScrolling: true,
+        scrollBeyondLastLine: false,
       }),
     )
+
+    editorInstance.onDidScrollChange(() => {
+      injector.getInstance(ScrollService).emit('onScroll', { top: editorInstance.getScrollTop() === 0 })
+    })
 
     useDisposable('themeChange', () =>
       themeProvider.subscribe('themeChanged', () => {
@@ -61,7 +68,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
   },
   render: ({ element }) => {
     element.style.display = 'block'
-    element.style.height = 'calc(100% - 46px)'
+    element.style.height = '100%'
     return null
   },
 })

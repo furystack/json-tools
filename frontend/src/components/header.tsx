@@ -3,6 +3,7 @@ import { AppBar, AppBarLink as ShadeAppBarLink, Button } from '@furystack/shades
 import { environmentOptions } from '../environment-options.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
+import { ScrollService } from '../services/scroll-service.js'
 
 const AppBarLink = styledShade(ShadeAppBarLink, {
   display: 'flex',
@@ -11,7 +12,17 @@ const AppBarLink = styledShade(ShadeAppBarLink, {
 
 export const Header = Shade({
   shadowDomName: 'shade-app-header',
-  render: () => {
+  render: ({ useDisposable, injector, element }) => {
+    useDisposable('scrollListener', () =>
+      injector.getInstance(ScrollService).subscribe('onScroll', ({ top }) => {
+        console.log('top', top)
+        element.style.top = top ? '0' : '-64px'
+      }),
+    )
+
+    element.style.position = 'absolute'
+    element.style.transition = 'top 0.3s ease-in-out'
+
     return (
       <AppBar id="header">
         <AppBarLink title="JSON Tools" href="/">

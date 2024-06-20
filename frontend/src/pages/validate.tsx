@@ -50,7 +50,6 @@ export const ValidatePage = Shade({
       <div
         style={{
           position: 'fixed',
-          top: '46px',
           height: '100%',
           width: '100%',
         }}>
