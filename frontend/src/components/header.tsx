@@ -16,9 +16,17 @@ export const Header = Shade({
     useDisposable('scrollListener', () =>
       injector.getInstance(ScrollService).subscribe('onScroll', ({ top }) => {
         console.log('top', top)
-        element.style.top = top ? '0' : '-64px'
+        element.style.top = top ? '0' : '-42px'
       }),
     )
+
+    element.onmouseleave = () => {
+      element.style.top = '-42px'
+    }
+
+    element.onmouseenter = () => {
+      element.style.top = '0'
+    }
 
     element.style.position = 'absolute'
     element.style.transition = 'top 0.3s ease-in-out'

@@ -22,6 +22,7 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-diff-editor',
   constructed: ({ element, props, injector, useDisposable }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
+    const scrollService = injector.getInstance(ScrollService)
 
     const editorInstance = editor.createDiffEditor(element as HTMLElement, {
       ...props.options,
@@ -81,15 +82,11 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
     editorInstance.getOriginalEditor().addAction(orderFieldsAction)
 
     editorInstance.getOriginalEditor().onDidScrollChange(() => {
-      injector
-        .getInstance(ScrollService)
-        .emit('onScroll', { top: editorInstance.getOriginalEditor().getScrollTop() === 0 })
+      scrollService.emit('onScroll', { top: editorInstance.getOriginalEditor().getScrollTop() === 0 })
     })
 
     editorInstance.getModifiedEditor().onDidScrollChange(() => {
-      injector
-        .getInstance(ScrollService)
-        .emit('onScroll', { top: editorInstance.getModifiedEditor().getScrollTop() === 0 })
+      scrollService.emit('onScroll', { top: editorInstance.getModifiedEditor().getScrollTop() === 0 })
     })
 
     Object.assign(element, { editorInstance })

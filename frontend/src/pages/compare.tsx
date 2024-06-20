@@ -8,27 +8,35 @@ export const ComparePage = Shade({
   render: ({ injector, useObservable, element }) => {
     const locationService = injector.getInstance(LocationService)
 
-    const [original, setOriginal] = useObservable('original', locationService.useSearchParam('original', ''), {
-      onChange: (newValue) => {
-        const originalEditor = (
-          element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
-        )?.getOriginalEditor()
-        const pos = originalEditor.getPosition()
-        originalEditor.setValue(newValue)
-        pos && originalEditor.setPosition(pos)
+    const [original, setOriginal] = useObservable(
+      'original',
+      locationService.useSearchParam('original', JSON.stringify({ foo: 'bar' }, undefined, 2)),
+      {
+        onChange: (newValue) => {
+          const originalEditor = (
+            element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
+          )?.getOriginalEditor()
+          const pos = originalEditor.getPosition()
+          originalEditor.setValue(newValue)
+          pos && originalEditor.setPosition(pos)
+        },
       },
-    })
-    const [modified, setModified] = useObservable('modified', locationService.useSearchParam('modified', ''), {
-      onChange: (newValue) => {
-        const modifiedEditor = (
-          element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
-        )?.getModifiedEditor()
+    )
+    const [modified, setModified] = useObservable(
+      'modified',
+      locationService.useSearchParam('modified', JSON.stringify({ foo: 'baz' }, undefined, 2)),
+      {
+        onChange: (newValue) => {
+          const modifiedEditor = (
+            element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
+          )?.getModifiedEditor()
 
-        const pos = modifiedEditor.getPosition()
-        modifiedEditor.setValue(newValue)
-        pos && modifiedEditor.setPosition(pos)
+          const pos = modifiedEditor.getPosition()
+          modifiedEditor.setValue(newValue)
+          pos && modifiedEditor.setPosition(pos)
+        },
       },
-    })
+    )
 
     return (
       <div

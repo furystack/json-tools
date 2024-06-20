@@ -11,15 +11,19 @@ export const ValidatePage = Shade({
     const locationService = injector.getInstance(LocationService)
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const [value, setValue] = useObservable('value', locationService.useSearchParam('value', ''), {
-      onChange: (newValue) => {
-        const editorInstance = element.querySelector<any>('monaco-editor')
-          ?.editorInstance as editor.IStandaloneCodeEditor
-        const pos = editorInstance.getPosition()
-        editorInstance.setValue(newValue)
-        pos && editorInstance.setPosition(pos)
+    const [value, setValue] = useObservable(
+      'value',
+      locationService.useSearchParam('value', JSON.stringify({ value: 'Enter a value to verify' }, undefined, 2)),
+      {
+        onChange: (newValue) => {
+          const editorInstance = element.querySelector<any>('monaco-editor')
+            ?.editorInstance as editor.IStandaloneCodeEditor
+          const pos = editorInstance.getPosition()
+          editorInstance.setValue(newValue)
+          pos && editorInstance.setPosition(pos)
+        },
       },
-    })
+    )
 
     const [jsonSchema] = useSearchState('jsonSchema', '')
 
