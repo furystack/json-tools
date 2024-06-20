@@ -2,6 +2,7 @@ import { createComponent, Shade, Router } from '@furystack/shades'
 import { ComparePage } from '../pages/compare.js'
 import { ValidatePage } from '../pages/validate.js'
 import { Home } from '../pages/home.js'
+import { NotyList } from '@furystack/shades-common-components'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -15,6 +16,7 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
             { url: '/', routingOptions: { end: false }, component: () => <Home /> },
           ]}
         />
+        <NotyList style={{ marginBottom: '2em' }} />
       </div>
     )
   },

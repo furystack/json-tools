@@ -17,14 +17,14 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
     return (
       <>
         <Button
-          style={{
-            position: 'fixed',
-            bottom: '10px',
-            left: '10px',
-          }}
+          title="Edit JSON schema"
+          variant="outlined"
           onclick={() => {
             isVisible.setValue(true)
           }}>
+          <i className="material-symbols-outlined" style={{ fontSize: '1.15em', marginRight: '8px' }}>
+            data_object
+          </i>
           Schema
         </Button>
         <Modal

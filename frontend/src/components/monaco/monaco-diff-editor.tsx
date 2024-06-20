@@ -4,7 +4,7 @@ import type { Uri } from 'monaco-editor'
 import 'monaco-editor/esm/vs/editor/editor.main'
 
 import './worker-config.js'
-import { ThemeProviderService, getCssVariable } from '@furystack/shades-common-components'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 import { darkTheme } from '../../themes/dark.js'
 import { orderFieldsAction } from './order-fields.js'
 
@@ -19,15 +19,21 @@ export interface MonacoEditorProps {
 }
 export const MonacoDiffEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-diff-editor',
-  constructed: ({ element, props, injector, useState, useDisposable }) => {
+  constructed: ({ element, props, injector, useDisposable }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
 
-    const [theme] = useState<'vs-light' | 'vs-dark'>(
-      'theme',
-      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'vs-dark' : 'vs-light',
-    )
+    const editorInstance = editor.createDiffEditor(element as HTMLElement, {
+      ...props.options,
+      theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+    })
 
-    const editorInstance = editor.createDiffEditor(element as HTMLElement, { ...props.options, theme })
+    useDisposable('themeChange', () =>
+      themeProvider.subscribe('themeChanged', () => {
+        editorInstance.updateOptions({
+          theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+        } as any)
+      }),
+    )
 
     const originalModel = editor.createModel(props.originalValue || '', 'json')
     const modifiedModel = editor.createModel(props.modifiedValue || '', 'json')

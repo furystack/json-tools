@@ -3,6 +3,7 @@ import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { MonacoEditor } from '../components/monaco/monaco-editor.js'
 import { JsonSchemaSelector } from '../components/json-schema-selector.js'
 import { MonacoModelProvider } from '../services/monaco-model-provider.js'
+import { ShareButton } from '../components/share-button.js'
 
 export const ValidatePage = Shade({
   shadowDomName: 'shade-validate-page',
@@ -50,7 +51,7 @@ export const ValidatePage = Shade({
         style={{
           position: 'fixed',
           top: '65px',
-          height: 'calc(100% - 65px)',
+          height: 'calc(100% - 10px)',
           width: '100%',
         }}>
         <MonacoEditor
@@ -64,12 +65,21 @@ export const ValidatePage = Shade({
             theme: 'vs-dark',
           }}
         />
-        <JsonSchemaSelector
-          schema={jsonSchema}
-          onSchemaChange={(schema) => {
-            setJsonSchema(schema)
-          }}
-        />
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}>
+          <JsonSchemaSelector
+            schema={jsonSchema}
+            onSchemaChange={(schema) => {
+              setJsonSchema(schema)
+            }}
+          />
+          <ShareButton />
+        </div>
       </div>
     )
   },

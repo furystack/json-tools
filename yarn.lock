@@ -508,9 +508,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^8.2.3":
-  version: 8.2.3
-  resolution: "@furystack/shades-common-components@npm:8.2.3"
+"@furystack/shades-common-components@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@furystack/shades-common-components@npm:9.0.0"
   dependencies:
     "@furystack/core": "npm:^14.0.5"
     "@furystack/inject": "npm:^11.0.3"
@@ -518,7 +518,7 @@ __metadata:
     "@furystack/utils": "npm:^7.0.2"
     path-to-regexp: "npm:^6.2.2"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10c0/c6316e595eb5fefd45a9eb0245168cc49bf333119dbf64403d91dccb2b42fbaca5e5a7d209b70fd32b00c9933962776f581a17696846746ffdc375fb419a05dd
+  checksum: 10c0/e04801ba82c66119901058015bdd53f3574c0816b2829b3a6779b3bf943edad4de6d1c37f7861cac2af990eb00c8a96f1312943aef158d991ac202628d5df74d
   languageName: node
   linkType: hard
 
@@ -2350,11 +2350,11 @@ __metadata:
     "@furystack/logging": "npm:^7.0.2"
     "@furystack/rest-client-fetch": "npm:^7.1.0"
     "@furystack/shades": "npm:^10.0.6"
-    "@furystack/shades-common-components": "npm:^8.2.3"
+    "@furystack/shades-common-components": "npm:^9.0.0"
     "@furystack/utils": "npm:^7.0.2"
     "@types/node": "npm:^20.14.6"
     fflate: "npm:^0.8.2"
-    monaco-editor: "npm:^0.49.0"
+    monaco-editor: "npm:^0.50.0"
     typescript: "npm:^5.4.5"
     vite: "npm:^5.3.1"
     vitest: "npm:^1.6.0"
@@ -3508,10 +3508,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monaco-editor@npm:^0.49.0":
-  version: 0.49.0
-  resolution: "monaco-editor@npm:0.49.0"
-  checksum: 10c0/c62d19e65f8ad441d0b29d8f43181c730bd373854ff0f9331c42ed1b97b729ab099e6f961c2e377acddda6923b8030e0453ae87edd3f7db3ace75c91f44431cd
+"monaco-editor@npm:^0.50.0":
+  version: 0.50.0
+  resolution: "monaco-editor@npm:0.50.0"
+  checksum: 10c0/79189c926c2fc1e3a3b9118e80911599bf18108018fe176c7b47a27b4856b544129f9a59c9a5c321d154d6a30a8d9c231684246e9382f4f18329a548d11cb4d6
   languageName: node
   linkType: hard
 

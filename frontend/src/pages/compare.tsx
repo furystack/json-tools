@@ -1,6 +1,7 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
 import type { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { MonacoDiffEditor } from '../components/monaco/monaco-diff-editor.js'
+import { ShareButton } from '../components/share-button.js'
 
 export const ComparePage = Shade({
   shadowDomName: 'shade-compare-page',
@@ -34,11 +35,9 @@ export const ComparePage = Shade({
         style={{
           position: 'fixed',
           top: '63px',
-          height: 'calc(100% - 63px)',
+          height: 'calc(100% - 10px)',
           width: '100%',
-          backgroundColor: 'darkgray',
-        }}
-      >
+        }}>
         <MonacoDiffEditor
           originalValue={original}
           modifiedValue={modified}
@@ -53,6 +52,14 @@ export const ComparePage = Shade({
             } as any
           }
         />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}>
+          <ShareButton />
+        </div>
       </div>
     )
   },
