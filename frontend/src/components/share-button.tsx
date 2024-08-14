@@ -24,13 +24,15 @@ export const ShareButton = Shade({
               </>
             ),
           })
-        }}>
+        }}
+      >
         <i
           style={{
             fontSize: 'inherit',
             marginRight: '8px',
           }}
-          className="material-symbols-outlined">
+          className="material-symbols-outlined"
+        >
           share
         </i>
         Share

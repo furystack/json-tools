@@ -1,9 +1,9 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { MonacoEditor } from '../components/monaco/monaco-editor.js'
 import { JsonSchemaSelector } from '../components/json-schema-selector.js'
-import { MonacoModelProvider } from '../services/monaco-model-provider.js'
+import { MonacoEditor } from '../components/monaco/monaco-editor.js'
 import { ShareButton } from '../components/share-button.js'
+import { MonacoModelProvider } from '../services/monaco-model-provider.js'
 
 export const ValidatePage = Shade({
   shadowDomName: 'shade-validate-page',
@@ -63,7 +63,8 @@ export const ValidatePage = Shade({
           position: 'fixed',
           height: '100%',
           width: '100%',
-        }}>
+        }}
+      >
         <MonacoEditor
           value={value}
           onValueChange={(newValue) => setValue(newValue)}
@@ -84,7 +85,8 @@ export const ValidatePage = Shade({
             zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <JsonSchemaSelector
             schema={jsonSchema}
             onSchemaChange={(schema) => {
