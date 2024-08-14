@@ -22,7 +22,8 @@ export const Layout = Shade({
           padding: '0',
           margin: '0',
           background: injector.getInstance(ThemeProviderService).theme.background.default,
-        }}>
+        }}
+      >
         <Header title="JSON-Tools" />
         <Body style={{ width: '100%', height: '100%', overflow: 'auto' }} />
       </div>

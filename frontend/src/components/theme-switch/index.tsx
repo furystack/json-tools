@@ -18,7 +18,8 @@ export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
         onclick={() => {
           themeProvider.setAssignedTheme(theme === 'dark' ? defaultLightTheme : defaultDarkTheme)
           setTheme(theme === 'dark' ? 'light' : 'dark')
-        }}>
+        }}
+      >
         {theme === 'dark' ? (
           <i style={{ fontSize: '1.27em' }} className="material-symbols-outlined">
             light_mode

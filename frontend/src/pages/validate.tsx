@@ -56,7 +56,8 @@ export const ValidatePage = Shade({
           position: 'fixed',
           height: '100%',
           width: '100%',
-        }}>
+        }}
+      >
         <MonacoEditor
           value={value}
           onValueChange={(newValue) => setValue(newValue)}
@@ -77,7 +78,8 @@ export const ValidatePage = Shade({
             zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <JsonSchemaSelector
             schema={jsonSchema}
             onSchemaChange={(schema) => {

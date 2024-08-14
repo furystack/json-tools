@@ -44,7 +44,8 @@ export const ComparePage = Shade({
           position: 'fixed',
           height: '100%',
           width: '100%',
-        }}>
+        }}
+      >
         <MonacoDiffEditor
           originalValue={original}
           modifiedValue={modified}
@@ -67,7 +68,8 @@ export const ComparePage = Shade({
             zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <ShareButton />
         </div>
       </div>
