@@ -1,9 +1,9 @@
-name: Build and execute tests
+name: UI tests for Showcase app
 on: [push]
 jobs:
   build:
-    name: Lint, Build and test
-    timeout-minutes: 5
+    name: Build and run UI tests
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     strategy:
@@ -18,16 +18,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: yarn install
-      - name: Prettier check
-        run: yarn prettier:check
-      - name: Lint
-        run: yarn lint
-      - name: Build
+      - name: Build app
         run: yarn build
-      - name: Test
-        run: yarn test:unit
-      - uses: codecov/codecov-action@v2
+      - name: Install Playwright browsers
+        run: yarn playwright install --with-deps
+      - name: Execute tests
+        run: yarn test:e2e
+      - uses: actions/upload-artifact@v2
+        if: failure()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-        env:
-          CI: true
+          path: e2e
+          name: ScreenShots

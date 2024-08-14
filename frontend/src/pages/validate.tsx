@@ -1,9 +1,9 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { MonacoEditor } from '../components/monaco/monaco-editor.js'
 import { JsonSchemaSelector } from '../components/json-schema-selector.js'
-import { MonacoModelProvider } from '../services/monaco-model-provider.js'
+import { MonacoEditor } from '../components/monaco/monaco-editor.js'
 import { ShareButton } from '../components/share-button.js'
+import { MonacoModelProvider } from '../services/monaco-model-provider.js'
 
 export const ValidatePage = Shade({
   shadowDomName: 'shade-validate-page',
@@ -16,11 +16,15 @@ export const ValidatePage = Shade({
       locationService.useSearchParam('value', JSON.stringify({ value: 'Enter a value to verify' }, undefined, 2)),
       {
         onChange: (newValue) => {
-          const editorInstance = element.querySelector<any>('monaco-editor')
-            ?.editorInstance as editor.IStandaloneCodeEditor
-          const pos = editorInstance.getPosition()
-          editorInstance.setValue(newValue)
-          pos && editorInstance.setPosition(pos)
+          const editorInstance = element.querySelector<HTMLElement & { editorInstance?: editor.IStandaloneCodeEditor }>(
+            'monaco-editor',
+          )?.editorInstance
+          const pos = editorInstance?.getPosition()
+          editorInstance?.setValue(newValue)
+
+          if (pos) {
+            editorInstance?.setPosition(pos)
+          }
         },
       },
     )
@@ -29,17 +33,20 @@ export const ValidatePage = Shade({
 
     const [, setJsonSchema] = useObservable('schema', locationService.useSearchParam('jsonSchema', ''), {
       onChange: (newValue) => {
-        const editorInstance = element.querySelector<any>('monaco-editor')
-          ?.editorInstance as editor.IStandaloneCodeEditor
-        const oldModel = editorInstance.getModel()!
+        const editorInstance = element.querySelector<HTMLElement & { editorInstance?: editor.IStandaloneCodeEditor }>(
+          'monaco-editor',
+        )?.editorInstance
+        const oldModel = editorInstance?.getModel()
 
         const uri = modelProvider.getModelUriForEntityType({
           schemaName: JSON.stringify(newValue).replace(/[^a-zA-Z0-9]/g, ''),
           jsonSchema: JSON.parse(newValue),
         })
 
-        editorInstance.setModel(editor.createModel(oldModel.getValue(), 'json', uri))
-        oldModel.dispose()
+        if (editorInstance && oldModel) {
+          editorInstance?.setModel(editor.createModel(oldModel.getValue(), 'json', uri))
+          oldModel?.dispose()
+        }
       },
     })
 
@@ -56,7 +63,8 @@ export const ValidatePage = Shade({
           position: 'fixed',
           height: '100%',
           width: '100%',
-        }}>
+        }}
+      >
         <MonacoEditor
           value={value}
           onValueChange={(newValue) => setValue(newValue)}
@@ -77,7 +85,8 @@ export const ValidatePage = Shade({
             zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <JsonSchemaSelector
             schema={jsonSchema}
             onSchemaChange={(schema) => {

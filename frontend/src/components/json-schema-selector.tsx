@@ -4,8 +4,8 @@ import { ObservableValue } from '@furystack/utils'
 import { MonacoEditor } from './monaco/monaco-editor.js'
 
 type JsonSchemaSelectorProps = {
-  schema: any
-  onSchemaChange: (schema: any) => void
+  schema: string
+  onSchemaChange: (schema: string) => void
 }
 
 export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
@@ -21,7 +21,8 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
           variant="outlined"
           onclick={() => {
             isVisible.setValue(true)
-          }}>
+          }}
+        >
           <i className="material-symbols-outlined" style={{ fontSize: '1.15em', marginRight: '8px' }}>
             data_object
           </i>
@@ -39,9 +40,11 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
             zIndex: '5',
           }}
           showAnimation={fadeIn}
-          hideAnimation={fadeOut}>
+          hideAnimation={fadeOut}
+        >
           <div
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}
+          >
             <Paper
               style={{ padding: '.5em', width: 'calc(100% - 14em)', height: 'calc(100% - 32em)' }}
               onclick={(ev) => ev.stopPropagation()}
@@ -49,7 +52,8 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
                 if (ev.key === 'Escape') {
                   isVisible.setValue(false)
                 }
-              }}>
+              }}
+            >
               <h5>Edit JSON schema</h5>
               <MonacoEditor
                 value={value.getValue()}
@@ -65,14 +69,16 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
                 <Button
                   onclick={() => {
                     isVisible.setValue(false)
-                  }}>
+                  }}
+                >
                   Close
                 </Button>
                 <Button
                   onclick={() => {
                     props.onSchemaChange(value.getValue())
                     isVisible.setValue(false)
-                  }}>
+                  }}
+                >
                   Apply
                 </Button>
               </div>

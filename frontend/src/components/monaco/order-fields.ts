@@ -25,10 +25,10 @@ export const orderFieldsAction: editor.IActionDescriptor = {
   label: 'Order Fields',
   contextMenuGroupId: 'navigation',
   contextMenuOrder: 1.5,
-  run: (ed) => {
+  run: async (ed) => {
     const object = JSON.parse(ed.getValue())
     const ordered = orderFields(object)
     ed.setValue(JSON.stringify(ordered, undefined, 4))
-    ed.getAction('editor.action.format')?.run()
+    await ed.getAction('editor.action.format')?.run()
   },
 }

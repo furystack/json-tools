@@ -18,11 +18,11 @@ const config: PlaywrightTestConfig = {
   },
   use: {
     trace: 'on-first-retry',
-    baseURL: 'http://localhost:9090',
+    baseURL: 'http://localhost:8080',
   },
   webServer: {
-    command: 'yarn start:service',
-    url: 'http://localhost:9090',
+    command: 'yarn start',
+    url: 'http://localhost:8080',
     reuseExistingServer: !isInCi,
   },
   projects: [

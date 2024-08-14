@@ -1,9 +1,9 @@
 import { createComponent, Shade, styledShade } from '@furystack/shades'
-import { AppBar, AppBarLink as ShadeAppBarLink, Button } from '@furystack/shades-common-components'
+import { AppBar, Button, AppBarLink as ShadeAppBarLink } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
+import { ScrollService } from '../services/scroll-service.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
-import { ScrollService } from '../services/scroll-service.js'
 
 const AppBarLink = styledShade(ShadeAppBarLink, {
   display: 'flex',
@@ -13,9 +13,10 @@ const AppBarLink = styledShade(ShadeAppBarLink, {
 export const Header = Shade({
   shadowDomName: 'shade-app-header',
   render: ({ useDisposable, injector, element }) => {
+    const scrollService = injector.getInstance(ScrollService)
+
     useDisposable('scrollListener', () =>
-      injector.getInstance(ScrollService).subscribe('onScroll', ({ top }) => {
-        console.log('top', top)
+      scrollService.subscribe('onScroll', ({ top }) => {
         element.style.top = top ? '0' : '-42px'
       }),
     )

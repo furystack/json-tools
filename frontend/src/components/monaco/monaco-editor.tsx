@@ -51,7 +51,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
         const model = editor.createModel(props.value || '', 'json', props.modelUri)
         editorInstance.setModel(model)
         return {
-          dispose: () => {
+          [Symbol.dispose]: () => {
             model.dispose()
           },
         }

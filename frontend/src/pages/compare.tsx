@@ -13,12 +13,14 @@ export const ComparePage = Shade({
       locationService.useSearchParam('original', JSON.stringify({ foo: 'bar' }, undefined, 2)),
       {
         onChange: (newValue) => {
-          const originalEditor = (
-            element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
-          )?.getOriginalEditor()
-          const pos = originalEditor.getPosition()
-          originalEditor.setValue(newValue)
-          pos && originalEditor.setPosition(pos)
+          const originalEditor = element
+            .querySelector<HTMLElement & { editorInstance?: editor.IDiffEditor }>('monaco-diff-editor')
+            ?.editorInstance?.getOriginalEditor()
+          const pos = originalEditor?.getPosition()
+          originalEditor?.setValue(newValue)
+          if (pos) {
+            originalEditor?.setPosition(pos)
+          }
         },
       },
     )
@@ -27,13 +29,14 @@ export const ComparePage = Shade({
       locationService.useSearchParam('modified', JSON.stringify({ foo: 'baz' }, undefined, 2)),
       {
         onChange: (newValue) => {
-          const modifiedEditor = (
-            element.querySelector<any>('monaco-diff-editor')?.editorInstance as editor.IDiffEditor
-          )?.getModifiedEditor()
-
-          const pos = modifiedEditor.getPosition()
-          modifiedEditor.setValue(newValue)
-          pos && modifiedEditor.setPosition(pos)
+          const modifiedEditor = element
+            .querySelector<HTMLElement & { editorInstance?: editor.IDiffEditor }>('monaco-diff-editor')
+            ?.editorInstance?.getModifiedEditor()
+          const pos = modifiedEditor?.getPosition()
+          modifiedEditor?.setValue(newValue)
+          if (pos) {
+            modifiedEditor?.setPosition(pos)
+          }
         },
       },
     )
@@ -44,7 +47,8 @@ export const ComparePage = Shade({
           position: 'fixed',
           height: '100%',
           width: '100%',
-        }}>
+        }}
+      >
         <MonacoDiffEditor
           originalValue={original}
           modifiedValue={modified}
@@ -67,7 +71,8 @@ export const ComparePage = Shade({
             zIndex: '100',
             alignItems: 'center',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <ShareButton />
         </div>
       </div>
