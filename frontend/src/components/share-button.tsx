@@ -8,9 +8,9 @@ export const ShareButton = Shade({
       <Button
         title="Copy a shareable URL to the clipboard"
         variant="outlined"
-        onclick={() => {
+        onclick={async () => {
           const url = new URL(location.href)
-          navigator.clipboard.writeText(url.href)
+          await navigator.clipboard.writeText(url.href)
           injector.getInstance(NotyService).emit('onNotyAdded', {
             type: 'success',
             title: 'Copied to clipboard',
@@ -24,15 +24,13 @@ export const ShareButton = Shade({
               </>
             ),
           })
-        }}
-      >
+        }}>
         <i
           style={{
             fontSize: 'inherit',
             marginRight: '8px',
           }}
-          className="material-symbols-outlined"
-        >
+          className="material-symbols-outlined">
           share
         </i>
         Share

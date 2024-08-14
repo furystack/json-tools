@@ -31,7 +31,7 @@ export const serializeToQueryString = <T extends object>(queryObject: T): string
   ).toString()
 }
 
-const decode = (value: string) => {
+const decode = (value: string): unknown => {
   const decoded = decodeURIComponent(value)
   const base64Decoded = atob(decoded)
   const uintArrayed = strToU8(base64Decoded, true)
@@ -42,7 +42,7 @@ const decode = (value: string) => {
 export const deserializeQueryString = (fullQueryString: string) => {
   const params = [...new URLSearchParams(fullQueryString).entries()]
     .filter(([key, value]) => key && value)
-    .map(([key, value]) => [key, decode(value)])
+    .map(([key, value]) => [key, decode(value)] as const)
 
   return Object.fromEntries(params)
 }
@@ -55,7 +55,7 @@ themeProviderService.setAssignedTheme(themeName === 'light' ? lightTheme : darkT
 
 useLogging(shadeInjector, VerboseConsoleLogger)
 
-getLogger(shadeInjector).withScope('Startup').verbose({
+void getLogger(shadeInjector).withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',
   data: { environmentOptions },
 })

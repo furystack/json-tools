@@ -17,13 +17,12 @@
     "@eslint/js": "^9.9.0",
     "@playwright/test": "^1.46.0",
     "@types/node": "^22.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.1.0",
-    "@typescript-eslint/parser": "^8.1.0",
     "@vitest/coverage-v8": "^2.0.5",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-jsdoc": "^50.2.1",
+    "eslint-plugin-playwright": "^1.6.2",
     "eslint-plugin-prettier": "^5.2.1",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.9",
@@ -67,5 +66,5 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "packageManager": "yarn@4.3.0"
+  "packageManager": "yarn@4.4.0"
 }

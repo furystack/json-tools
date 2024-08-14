@@ -35,7 +35,7 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
       themeProvider.subscribe('themeChanged', () => {
         editorInstance.updateOptions({
           theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
-        } as any)
+        } as editor.IDiffEditorOptions)
       }),
     )
 
@@ -44,34 +44,36 @@ export const MonacoDiffEditor = Shade<MonacoEditorProps>({
 
     editorInstance.setModel({ original: originalModel, modified: modifiedModel })
 
-    props.onOriginalValueChange &&
+    if (props.onOriginalValueChange) {
       editorInstance.getOriginalEditor().onKeyUp(() => {
         props.onOriginalValueChange?.(editorInstance.getOriginalEditor().getValue())
       })
+    }
 
     if (props.originalModelUri) {
       useDisposable('monacoOriginalModelUri', () => {
         const model = editor.createModel(editorInstance.getOriginalEditor().getValue(), 'json', props.originalModelUri)
         editorInstance.getOriginalEditor().setModel(model)
         return {
-          dispose: () => {
+          [Symbol.dispose]: () => {
             model.dispose()
           },
         }
       })
     }
 
-    props.onModifiedValueChange &&
+    if (props.onModifiedValueChange) {
       editorInstance.getModifiedEditor().onKeyUp(() => {
         props.onModifiedValueChange?.(editorInstance.getModifiedEditor().getValue())
       })
+    }
 
     if (props.modifiedModelUri) {
       useDisposable('monacoModifiedModelUri', () => {
         const model = editor.createModel(editorInstance.getModifiedEditor().getValue(), 'json', props.modifiedModelUri)
         editorInstance.getModifiedEditor().setModel(model)
         return {
-          dispose: () => {
+          [Symbol.dispose]: () => {
             model.dispose()
           },
         }
