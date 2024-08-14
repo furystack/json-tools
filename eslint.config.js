@@ -9,11 +9,12 @@ import tseslint from 'typescript-eslint'
 export default tseslint.config(
   {
     ...playwright.configs['flat/recommended'],
-    files: ['packages/shades-showcase-app/e2e'],
+    files: ['e2e'],
   },
   {
     ignores: [
       'coverage',
+      'test-results',
       'packages/*/node_modules/*',
       'packages/*/esm/*',
       'packages/*/types/*',
