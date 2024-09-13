@@ -24,6 +24,8 @@ jobs:
         run: yarn lint
       - name: Build
         run: yarn build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Test
         run: yarn test:unit
       - uses: codecov/codecov-action@v2
