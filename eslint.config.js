@@ -22,6 +22,7 @@ export default tseslint.config(
       '.yarn/*',
       'eslint.config.js',
       'prettier.config.js',
+      'frontend/vite.config.ts',
     ],
   },
   eslint.configs.recommended,
@@ -34,7 +35,9 @@ export default tseslint.config(
     },
     languageOptions: {
       parserOptions: {
-        project: ['tsconfig.json'],
+        projectService: {
+          defaultProject: 'tsconfig.json',
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
