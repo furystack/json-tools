@@ -45,6 +45,10 @@ export const Header = Shade({
           <i className="material-symbols-outlined">compare_arrows</i>
           Compare
         </AppBarLink>
+        <AppBarLink href="/i18n">
+          <i className="material-symbols-outlined">translate</i>
+          i18n
+        </AppBarLink>
 
         <div style={{ flex: '1' }} />
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
