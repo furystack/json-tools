@@ -1,5 +1,5 @@
 import { CollectionService } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
+import { ObservableValue, type ValueObserver } from '@furystack/utils'
 import type { TranslationFileEntry } from './translation-file-entry.js'
 
 export class I18NOverviewService<TLocales extends string, TNamespace extends string, TKeys extends string>
@@ -24,9 +24,16 @@ export class I18NOverviewService<TLocales extends string, TNamespace extends str
     this.namespaces = Array.from(new Set(files.map((file) => file.namespace)) as unknown as Set<TNamespace>)
     this.currentNamespace = new ObservableValue<TNamespace>(this.namespaces[0])
     this.keys = Array.from(new Set(files.flatMap((file) => Object.keys(file.getValues())) as unknown as Set<TKeys>))
+
+    this.onNamespaceChange = this.currentNamespace.subscribe(() => {
+      this.loadToCollectionService()
+    })
+    this.onLocalesChange = this.currentLocales.subscribe(() => {
+      this.loadToCollectionService()
+    })
   }
 
-  public getValuesFromNamepsaceForLocales(): Array<Record<TLocales, Record<TKeys, string | undefined>>> {
+  public loadToCollectionService(): Array<Record<TLocales, Record<TKeys, string | undefined>>> {
     const locales = this.currentLocales.getValue()
     const filteredFiles = this.files.filter(
       (file) => this.locales.includes(file.locale as TLocales) && file.namespace === this.currentNamespace.getValue(),
@@ -51,8 +58,14 @@ export class I18NOverviewService<TLocales extends string, TNamespace extends str
     return dataEntries
   }
 
+  private onNamespaceChange: ValueObserver<TNamespace>
+
+  private onLocalesChange: ValueObserver<TLocales[]>
+
   public [Symbol.dispose](): void {
     this.currentNamespace[Symbol.dispose]()
     this.collectionService[Symbol.dispose]()
+    this.onNamespaceChange[Symbol.dispose]()
+    this.onLocalesChange[Symbol.dispose]()
   }
 }
