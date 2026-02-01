@@ -109,12 +109,12 @@ export const editor = Shade(...) // Too generic
 ```typescript
 // ✅ Good
 export function getEnvironmentOptions() {}
-export const isValidJson = true;
-export const DEFAULT_THEME = 'dark';
+export const isValidJson = true
+export const DEFAULT_THEME = 'dark'
 
 // ❌ Avoid
 export function GetEnvironmentOptions() {}
-export const IsValidJson = true;
+export const IsValidJson = true
 ```
 
 ## Project Structure
@@ -176,18 +176,18 @@ components/
 
 ```typescript
 // ✅ Good - organized imports
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'events'
 
-import { Shade } from '@furystack/shades';
-import { Injector } from '@furystack/inject';
+import { Shade } from '@furystack/shades'
+import { Injector } from '@furystack/inject'
 
-import { MonacoEditor } from '../components/monaco/monaco-editor.js';
-import type { EditorOptions } from './types.js';
+import { MonacoEditor } from '../components/monaco/monaco-editor.js'
+import type { EditorOptions } from './types.js'
 
 // ❌ Avoid - random ordering
-import { MonacoEditor } from '../components/monaco/monaco-editor.js';
-import { EventEmitter } from 'events';
-import { Injector } from '@furystack/inject';
+import { MonacoEditor } from '../components/monaco/monaco-editor.js'
+import { EventEmitter } from 'events'
+import { Injector } from '@furystack/inject'
 ```
 
 ### Import Grouping
@@ -196,10 +196,10 @@ Separate import groups with blank lines:
 
 ```typescript
 // ✅ Good - separated groups
-import { Injector } from '@furystack/inject';
-import { Shade } from '@furystack/shades';
+import { Injector } from '@furystack/inject'
+import { Shade } from '@furystack/shades'
 
-import { MonacoEditor } from './components/monaco/monaco-editor.js';
+import { MonacoEditor } from './components/monaco/monaco-editor.js'
 ```
 
 ## Code Organization
@@ -228,27 +228,27 @@ export const MyComponent = Shade<MyComponentProps>({
 
 ```typescript
 // 1. Imports
-import { Injectable, Injected } from '@furystack/inject';
-import { ObservableValue } from '@furystack/utils';
+import { Injectable, Injected } from '@furystack/inject'
+import { ObservableValue } from '@furystack/utils'
 
 // 2. Types
 type ServiceState = {
-  data: string;
-};
+  data: string
+}
 
 // 3. Service class
 @Injectable({ lifetime: 'singleton' })
 export class MyService {
   // Injected dependencies
   @Injected(OtherService)
-  private declare otherService: OtherService;
+  declare private otherService: OtherService
 
   // Observable state
-  public state = new ObservableValue<ServiceState | null>(null);
+  public state = new ObservableValue<ServiceState | null>(null)
 
   // Public methods
   public getData(): string {
-    return this.state.getValue()?.data ?? '';
+    return this.state.getValue()?.data ?? ''
   }
 }
 ```
@@ -278,18 +278,24 @@ export class MyService {
 
 ```tsx
 // ✅ Good - logical AND for simple cases
-{isLoading && <div>Loading...</div>}
+{
+  isLoading && <div>Loading...</div>
+}
 
 // ✅ Good - ternary for if-else
-{isLoading ? <div>Loading...</div> : <div>Content</div>}
+{
+  isLoading ? <div>Loading...</div> : <div>Content</div>
+}
 
 // ✅ Good - early return for complex cases
-if (isLoading) return <div>Loading...</div>;
-if (error) return <div>Error: {error}</div>;
-return <div>Content</div>;
+if (isLoading) return <div>Loading...</div>
+if (error) return <div>Error: {error}</div>
+return <div>Content</div>
 
 // ❌ Avoid - nested ternaries
-{isLoading ? <div>Loading...</div> : error ? <div>Error</div> : <div>Content</div>}
+{
+  isLoading ? <div>Loading...</div> : error ? <div>Error</div> : <div>Content</div>
+}
 ```
 
 ## Summary
