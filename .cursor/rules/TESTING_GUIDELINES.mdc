@@ -1,0 +1,234 @@
+---
+name: Testing Guidelines
+description: Unit testing with Vitest and E2E testing with Playwright
+globs:
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - 'e2e/**/*.ts'
+alwaysApply: false
+---
+
+# Testing Guidelines
+
+## Unit Testing with Vitest
+
+### Test Structure
+
+```typescript
+// ✅ Good - clear test structure
+describe('EnvironmentOptions', () => {
+  describe('getEnvironmentOptions', () => {
+    it('should return default options when no URL params', () => {
+      // Arrange
+      const url = new URL('http://localhost');
+
+      // Act
+      const result = getEnvironmentOptions(url);
+
+      // Assert
+      expect(result.theme).toBe('dark');
+    });
+  });
+});
+```
+
+### Test All Exported Functions
+
+Every exported function should have tests:
+
+```typescript
+// ✅ Good - testing public API
+describe('orderFields', () => {
+  it('should order object fields alphabetically', () => {
+    const input = { z: 1, a: 2, m: 3 };
+    const result = orderFields(input);
+    expect(Object.keys(result)).toEqual(['a', 'm', 'z']);
+  });
+
+  it('should handle nested objects', () => {
+    const input = { outer: { z: 1, a: 2 } };
+    const result = orderFields(input);
+    expect(Object.keys(result.outer)).toEqual(['a', 'z']);
+  });
+
+  it('should handle empty objects', () => {
+    const result = orderFields({});
+    expect(result).toEqual({});
+  });
+});
+```
+
+### Test Edge Cases
+
+Test boundary conditions and error scenarios:
+
+```typescript
+// ✅ Good - testing edge cases
+describe('parseJson', () => {
+  it('should handle valid JSON', () => {
+    const result = parseJson('{"key": "value"}');
+    expect(result).toEqual({ key: 'value' });
+  });
+
+  it('should handle invalid JSON', () => {
+    const result = parseJson('invalid');
+    expect(result).toBeNull();
+  });
+
+  it('should handle empty string', () => {
+    const result = parseJson('');
+    expect(result).toBeNull();
+  });
+
+  it('should handle null input', () => {
+    const result = parseJson(null as unknown as string);
+    expect(result).toBeNull();
+  });
+});
+```
+
+### Avoid False Positive Tests
+
+Ensure assertions always run:
+
+```typescript
+// ❌ False positive risk - passes if function doesn't throw
+it('should throw on error', async () => {
+  try {
+    await functionThatShouldThrow();
+  } catch (error) {
+    expect(error).toBeInstanceOf(Error);
+  }
+});
+
+// ✅ Correct - fails if assertions don't run
+it('should throw on error', async () => {
+  expect.assertions(1);
+  try {
+    await functionThatShouldThrow();
+  } catch (error) {
+    expect(error).toBeInstanceOf(Error);
+  }
+});
+
+// ✅ Better - use expect().rejects
+it('should throw on error', async () => {
+  await expect(functionThatShouldThrow()).rejects.toThrow();
+});
+```
+
+## E2E Testing with Playwright
+
+### Page Object Pattern
+
+```typescript
+// e2e/page.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Home Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
+  test('should display editor', async ({ page }) => {
+    await expect(page.locator('.monaco-editor')).toBeVisible();
+  });
+
+  test('should format JSON on button click', async ({ page }) => {
+    const editor = page.locator('.monaco-editor');
+    await editor.fill('{"z":1,"a":2}');
+    
+    await page.click('button:has-text("Format")');
+    
+    // Verify formatted output
+    await expect(editor).toContainText('"a": 2');
+  });
+});
+```
+
+### Visual Regression Testing
+
+```typescript
+// ✅ Good - visual snapshot testing
+test('should match visual snapshot', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveScreenshot('home-content.png');
+});
+
+test('should match title snapshot', async ({ page }) => {
+  await page.goto('/');
+  const title = page.locator('h1');
+  await expect(title).toHaveScreenshot('title.png');
+});
+```
+
+### Waiting for Elements
+
+```typescript
+// ✅ Good - wait for element to be ready
+test('should load editor', async ({ page }) => {
+  await page.goto('/');
+  
+  // Wait for Monaco editor to initialize
+  await page.waitForSelector('.monaco-editor', { state: 'visible' });
+  
+  // Now interact with the editor
+  await page.click('.monaco-editor');
+});
+```
+
+## Test Coverage
+
+### Coverage Requirements
+
+- **Exported functions**: 100% coverage required
+- **Components**: Key render paths covered
+- **E2E**: Critical user flows covered
+
+```bash
+# Run unit tests with coverage
+yarn test:unit --coverage
+
+# Run E2E tests
+yarn test:e2e
+```
+
+## Running Tests
+
+### Available Commands
+
+```bash
+# Unit tests
+yarn test:unit
+
+# E2E tests
+yarn test:e2e
+
+# All tests
+yarn test:unit && yarn test:e2e
+```
+
+## Summary
+
+**Key Principles:**
+
+1. **Test all exported APIs** - 100% coverage for exports
+2. **Test edge cases** - Null, undefined, errors, empty states
+3. **Avoid false positives** - Use `expect.assertions()` when needed
+4. **E2E for critical flows** - Test main user journeys
+5. **Visual regression** - Snapshot testing for UI
+6. **Clear test structure** - describe > describe > it
+
+**Testing Checklist:**
+
+- [ ] All exported functions have tests
+- [ ] Edge cases tested (null, undefined, errors)
+- [ ] Error paths tested
+- [ ] E2E tests cover critical user flows
+- [ ] Visual snapshots updated when UI changes
+
+**Tools:**
+
+- Unit Tests: `vitest`
+- E2E Tests: `playwright`
+- Commands: `yarn test:unit`, `yarn test:e2e`
