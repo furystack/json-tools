@@ -19,10 +19,10 @@ This project uses Prettier for code formatting. **Always use the project's Prett
 
 ```bash
 # Format code
-yarn prettier
+yarn format
 
 # Check formatting
-yarn prettier:check
+yarn format:check
 ```
 
 ### ESLint Configuration
@@ -308,7 +308,7 @@ return <div>Content</div>;
 
 **Tools:**
 
-- Prettier: `yarn prettier`
+- Prettier: `yarn format`
 - ESLint: `yarn lint`
 - Type Check: `yarn build`
 - Unit Tests: `yarn test:unit`
