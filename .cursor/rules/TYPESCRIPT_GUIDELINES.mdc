@@ -1,0 +1,266 @@
+---
+name: TypeScript Guidelines
+description: TypeScript type safety and strict typing guidelines
+globs:
+  - '**/*.ts'
+  - '**/*.tsx'
+alwaysApply: true
+---
+
+# TypeScript Guidelines
+
+## Type Safety
+
+### NEVER use `any`
+
+There are no acceptable uses of `any` in this codebase:
+
+```typescript
+// ✅ Good - use unknown for truly unknown types
+export function processData(data: unknown): string {
+  if (typeof data === 'string') {
+    return data;
+  }
+  return JSON.stringify(data);
+}
+
+// ✅ Good - use generics for flexible types
+export function identity<T>(value: T): T {
+  return value;
+}
+
+// ❌ FORBIDDEN - using any
+export function processData(data: any): string {
+  return data.toString();
+}
+```
+
+### Explicit Types for Public APIs
+
+All exported functions and public methods should have explicit types:
+
+```typescript
+// ✅ Good - explicit types
+export function getEnvironmentOptions(): EnvironmentOptions {
+  // Implementation
+}
+
+export class EditorService {
+  public formatJson(input: string): string {
+    // Implementation
+  }
+}
+
+// ❌ Avoid - implicit return types for public APIs
+export function getEnvironmentOptions() {
+  // Return type is inferred - not ideal for public APIs
+}
+```
+
+## Type Definitions
+
+### Prefer `type` over `interface`
+
+```typescript
+// ✅ Good
+type EditorOptions = {
+  theme: 'light' | 'dark';
+  fontSize: number;
+};
+
+type JsonResult<T> = {
+  data: T;
+  valid: boolean;
+};
+
+// ❌ Avoid
+interface EditorOptions {
+  theme: string;
+  fontSize: number;
+}
+```
+
+### Component Props Types
+
+Define explicit prop types for all components:
+
+```typescript
+// ✅ Good - explicit props type
+type MonacoEditorProps = {
+  value: string;
+  onChange?: (value: string) => void;
+  language?: string;
+  readOnly?: boolean;
+};
+
+export const MonacoEditor = Shade<MonacoEditorProps>({
+  shadowDomName: 'monaco-editor',
+  render: ({ props }) => {
+    return (
+      <div data-testid="editor">
+        {/* Editor implementation */}
+      </div>
+    );
+  },
+});
+```
+
+## Type Guards
+
+### Provide Type Guards for Runtime Checks
+
+```typescript
+// ✅ Good - type guard
+export function isValidJson(value: unknown): value is object {
+  if (typeof value !== 'string') return false;
+  try {
+    JSON.parse(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Usage
+if (isValidJson(data)) {
+  console.log('Valid JSON');
+}
+```
+
+## Observable Types
+
+### Type Observable Values
+
+Always provide explicit types for ObservableValue:
+
+```typescript
+// ✅ Good - explicit observable type
+public currentTheme = new ObservableValue<'light' | 'dark'>('dark');
+public isLoading = new ObservableValue<boolean>(false);
+public editorContent = new ObservableValue<string>('');
+
+// ❌ Avoid - relying on inference for complex types
+public currentTheme = new ObservableValue(null); // Type is ObservableValue<null>
+```
+
+## Generic Patterns
+
+### Use Descriptive Generic Names
+
+```typescript
+// ✅ Good - descriptive generic names
+type JsonParseResult<TData> = {
+  data: TData;
+  valid: boolean;
+  error?: string;
+};
+
+// ❌ Avoid - unclear generic names
+type JsonParseResult<T> = {
+  data: T;
+  valid: boolean;
+};
+```
+
+### Constrain Generics When Appropriate
+
+```typescript
+// ✅ Good - constrained generic
+export function formatValue<T extends string | number | boolean>(value: T): string {
+  return String(value);
+}
+```
+
+## Strict Null Checks
+
+### Handle Null and Undefined Explicitly
+
+```typescript
+// ✅ Good - explicit null handling
+export function parseJson(input: string): object | null {
+  try {
+    return JSON.parse(input);
+  } catch {
+    return null;
+  }
+}
+
+// ✅ Good - use optional chaining
+const theme = options?.theme ?? 'dark';
+
+// ❌ Avoid - ignoring potential null
+const theme = options.theme; // Error if options is null
+```
+
+## Utility Types
+
+### Use TypeScript Utility Types
+
+```typescript
+// ✅ Good - using utility types
+type EditorOptions = {
+  theme: 'light' | 'dark';
+  fontSize: number;
+  language: string;
+};
+
+// Partial for optional fields
+type PartialEditorOptions = Partial<EditorOptions>;
+
+// Pick for specific fields
+type ThemeOption = Pick<EditorOptions, 'theme'>;
+
+// Omit for excluding fields
+type EditorWithoutTheme = Omit<EditorOptions, 'theme'>;
+```
+
+## Type Inference
+
+### Let TypeScript Infer When Possible
+
+```typescript
+// ✅ Good - let TypeScript infer internal types
+const users = ['Alice', 'Bob', 'Charlie']; // Inferred as string[]
+const count = users.length; // Inferred as number
+
+// ✅ Good - explicit for complex conditional logic
+export const getStatusDisplay = (status: string): JSX.Element | null => {
+  switch (status) {
+    case 'valid':
+      return <div>Valid</div>;
+    case 'invalid':
+      return <div>Invalid</div>;
+    default:
+      return null;
+  }
+};
+
+// ❌ Avoid - unnecessary annotations
+const count: number = 5;
+const name: string = 'John';
+```
+
+## Summary
+
+**Key Principles:**
+
+1. **NEVER use `any`** - Use `unknown`, generics, or proper types
+2. **Explicit types for exports** - Document the contract
+3. **Prefer `type` over `interface`**
+4. **Type component props** - Every Shade component should have typed props
+5. **Type observables** - Always provide explicit types for ObservableValue
+6. **Handle nulls** - Use strict null checks and optional chaining
+7. **Use type guards** - For runtime type checking
+
+**Type Safety Checklist:**
+
+- [ ] No `any` types anywhere
+- [ ] All exported functions have explicit return types
+- [ ] Component props are typed
+- [ ] Observable values have explicit types
+- [ ] Null/undefined handled explicitly
+
+**Tools:**
+
+- Type checking: `yarn build`
+- Strict mode: Enabled in `tsconfig.json`
