@@ -5,6 +5,21 @@ import { ShareButton } from '../components/share-button.js'
 
 export const ComparePage = Shade({
   shadowDomName: 'shade-compare-page',
+  css: {
+    '& .page-container': {
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+    },
+    '& .actions': {
+      position: 'fixed',
+      bottom: '0',
+      right: '0',
+      zIndex: '100',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+    },
+  },
   render: ({ injector, useObservable, element }) => {
     const locationService = injector.getInstance(LocationService)
 
@@ -42,13 +57,7 @@ export const ComparePage = Shade({
     )
 
     return (
-      <div
-        style={{
-          position: 'fixed',
-          height: '100%',
-          width: '100%',
-        }}
-      >
+      <div className="page-container">
         <MonacoDiffEditor
           originalValue={original}
           modifiedValue={modified}
@@ -63,16 +72,7 @@ export const ComparePage = Shade({
             } as any
           }
         />
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '0',
-            right: '0',
-            zIndex: '100',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}
-        >
+        <div className="actions">
           <ShareButton />
         </div>
       </div>

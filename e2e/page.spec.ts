@@ -5,6 +5,7 @@ test.describe('JSON-Tools Application', () => {
     await page.goto('/')
 
     const title = page.locator('shade-app-bar')
+    await page.hover('shade-app-bar')
     await expect(title).toHaveScreenshot('title.png')
 
     const home = page.locator('shade-home')

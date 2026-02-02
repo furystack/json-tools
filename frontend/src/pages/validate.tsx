@@ -7,6 +7,21 @@ import { MonacoModelProvider } from '../services/monaco-model-provider.js'
 
 export const ValidatePage = Shade({
   shadowDomName: 'shade-validate-page',
+  css: {
+    '& .page-container': {
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+    },
+    '& .actions': {
+      position: 'fixed',
+      bottom: '0',
+      right: '0',
+      zIndex: '100',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+    },
+  },
   render: ({ injector, useObservable, element, useSearchState }) => {
     const locationService = injector.getInstance(LocationService)
     const modelProvider = injector.getInstance(MonacoModelProvider)
@@ -58,13 +73,7 @@ export const ValidatePage = Shade({
       : undefined
 
     return (
-      <div
-        style={{
-          position: 'fixed',
-          height: '100%',
-          width: '100%',
-        }}
-      >
+      <div className="page-container">
         <MonacoEditor
           value={value}
           onValueChange={(newValue) => setValue(newValue)}
@@ -77,16 +86,7 @@ export const ValidatePage = Shade({
           }}
         />
 
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '0',
-            right: '0',
-            zIndex: '100',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}
-        >
+        <div className="actions">
           <JsonSchemaSelector
             schema={jsonSchema}
             onSchemaChange={(schema) => {
