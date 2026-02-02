@@ -10,6 +10,12 @@ type JsonSchemaSelectorProps = {
 
 export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
   shadowDomName: 'shade-json-schema-selector',
+  css: {
+    '& .material-symbols-outlined': {
+      fontSize: '1.15em',
+      marginRight: '8px',
+    },
+  },
   render: ({ props, useDisposable }) => {
     const isVisible = useDisposable('isVisible', () => new ObservableValue(false))
     const value = useDisposable('value', () => new ObservableValue(props.schema))
@@ -23,9 +29,7 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
             isVisible.setValue(true)
           }}
         >
-          <i className="material-symbols-outlined" style={{ fontSize: '1.15em', marginRight: '8px' }}>
-            data_object
-          </i>
+          <i className="material-symbols-outlined">data_object</i>
           Schema
         </Button>
         <Modal

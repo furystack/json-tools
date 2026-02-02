@@ -3,6 +3,12 @@ import { Button, NotyService } from '@furystack/shades-common-components'
 
 export const ShareButton = Shade({
   shadowDomName: 'shade-share-button',
+  css: {
+    '& .material-symbols-outlined': {
+      fontSize: 'inherit',
+      marginRight: '8px',
+    },
+  },
   render: ({ injector }) => {
     return (
       <Button
@@ -26,15 +32,7 @@ export const ShareButton = Shade({
           })
         }}
       >
-        <i
-          style={{
-            fontSize: 'inherit',
-            marginRight: '8px',
-          }}
-          className="material-symbols-outlined"
-        >
-          share
-        </i>
+        <i className="material-symbols-outlined">share</i>
         Share
       </Button>
     )

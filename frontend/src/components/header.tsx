@@ -12,25 +12,21 @@ const AppBarLink = styledShade(ShadeAppBarLink, {
 
 export const Header = Shade({
   shadowDomName: 'shade-app-header',
+  css: {
+    position: 'absolute',
+    top: '-42px',
+    transition: 'top 0.3s ease-in-out',
+    '&:hover': { top: '0' },
+    '&.scrolled': { top: '0' },
+  },
   render: ({ useDisposable, injector, element }) => {
     const scrollService = injector.getInstance(ScrollService)
 
     useDisposable('scrollListener', () =>
       scrollService.subscribe('onScroll', ({ top }) => {
-        element.style.top = top ? '0' : '-42px'
+        element.classList.toggle('scrolled', top)
       }),
     )
-
-    element.onmouseleave = () => {
-      element.style.top = '-42px'
-    }
-
-    element.onmouseenter = () => {
-      element.style.top = '0'
-    }
-
-    element.style.position = 'absolute'
-    element.style.transition = 'top 0.3s ease-in-out'
 
     return (
       <AppBar id="header">

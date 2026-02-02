@@ -5,22 +5,26 @@ import { Header } from './header.js'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
+  css: {
+    '& #Layout': {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      lineHeight: '1.6',
+      overflow: 'hidden',
+      padding: '0',
+      margin: '0',
+    },
+  },
   render: ({ injector }) => {
     return (
       <div
         id="Layout"
         style={{
-          position: 'fixed',
-          top: '0',
-          left: '0',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          lineHeight: '1.6',
-          overflow: 'hidden',
-          padding: '0',
-          margin: '0',
           background: injector.getInstance(ThemeProviderService).theme.background.default,
         }}
       >
