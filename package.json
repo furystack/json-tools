@@ -53,7 +53,7 @@
   "scripts": {
     "build": "tsc -b && yarn workspace frontend build",
     "test:e2e": "yarn playwright test",
-    "test:unit": "vitest",
+    "test": "vitest",
     "start": "yarn workspace frontend start",
     "clean": "rimraf frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo",
     "lint": "eslint .",

@@ -20,16 +20,16 @@ describe('EnvironmentOptions', () => {
   describe('getEnvironmentOptions', () => {
     it('should return default options when no URL params', () => {
       // Arrange
-      const url = new URL('http://localhost');
+      const url = new URL('http://localhost')
 
       // Act
-      const result = getEnvironmentOptions(url);
+      const result = getEnvironmentOptions(url)
 
       // Assert
-      expect(result.theme).toBe('dark');
-    });
-  });
-});
+      expect(result.theme).toBe('dark')
+    })
+  })
+})
 ```
 
 ### Test All Exported Functions
@@ -40,22 +40,22 @@ Every exported function should have tests:
 // ✅ Good - testing public API
 describe('orderFields', () => {
   it('should order object fields alphabetically', () => {
-    const input = { z: 1, a: 2, m: 3 };
-    const result = orderFields(input);
-    expect(Object.keys(result)).toEqual(['a', 'm', 'z']);
-  });
+    const input = { z: 1, a: 2, m: 3 }
+    const result = orderFields(input)
+    expect(Object.keys(result)).toEqual(['a', 'm', 'z'])
+  })
 
   it('should handle nested objects', () => {
-    const input = { outer: { z: 1, a: 2 } };
-    const result = orderFields(input);
-    expect(Object.keys(result.outer)).toEqual(['a', 'z']);
-  });
+    const input = { outer: { z: 1, a: 2 } }
+    const result = orderFields(input)
+    expect(Object.keys(result.outer)).toEqual(['a', 'z'])
+  })
 
   it('should handle empty objects', () => {
-    const result = orderFields({});
-    expect(result).toEqual({});
-  });
-});
+    const result = orderFields({})
+    expect(result).toEqual({})
+  })
+})
 ```
 
 ### Test Edge Cases
@@ -66,25 +66,25 @@ Test boundary conditions and error scenarios:
 // ✅ Good - testing edge cases
 describe('parseJson', () => {
   it('should handle valid JSON', () => {
-    const result = parseJson('{"key": "value"}');
-    expect(result).toEqual({ key: 'value' });
-  });
+    const result = parseJson('{"key": "value"}')
+    expect(result).toEqual({ key: 'value' })
+  })
 
   it('should handle invalid JSON', () => {
-    const result = parseJson('invalid');
-    expect(result).toBeNull();
-  });
+    const result = parseJson('invalid')
+    expect(result).toBeNull()
+  })
 
   it('should handle empty string', () => {
-    const result = parseJson('');
-    expect(result).toBeNull();
-  });
+    const result = parseJson('')
+    expect(result).toBeNull()
+  })
 
   it('should handle null input', () => {
-    const result = parseJson(null as unknown as string);
-    expect(result).toBeNull();
-  });
-});
+    const result = parseJson(null as unknown as string)
+    expect(result).toBeNull()
+  })
+})
 ```
 
 ### Avoid False Positive Tests
@@ -95,26 +95,26 @@ Ensure assertions always run:
 // ❌ False positive risk - passes if function doesn't throw
 it('should throw on error', async () => {
   try {
-    await functionThatShouldThrow();
+    await functionThatShouldThrow()
   } catch (error) {
-    expect(error).toBeInstanceOf(Error);
+    expect(error).toBeInstanceOf(Error)
   }
-});
+})
 
 // ✅ Correct - fails if assertions don't run
 it('should throw on error', async () => {
-  expect.assertions(1);
+  expect.assertions(1)
   try {
-    await functionThatShouldThrow();
+    await functionThatShouldThrow()
   } catch (error) {
-    expect(error).toBeInstanceOf(Error);
+    expect(error).toBeInstanceOf(Error)
   }
-});
+})
 
 // ✅ Better - use expect().rejects
 it('should throw on error', async () => {
-  await expect(functionThatShouldThrow()).rejects.toThrow();
-});
+  await expect(functionThatShouldThrow()).rejects.toThrow()
+})
 ```
 
 ## E2E Testing with Playwright
@@ -123,27 +123,27 @@ it('should throw on error', async () => {
 
 ```typescript
 // e2e/page.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
 test.describe('Home Page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-  });
+    await page.goto('/')
+  })
 
   test('should display editor', async ({ page }) => {
-    await expect(page.locator('.monaco-editor')).toBeVisible();
-  });
+    await expect(page.locator('.monaco-editor')).toBeVisible()
+  })
 
   test('should format JSON on button click', async ({ page }) => {
-    const editor = page.locator('.monaco-editor');
-    await editor.fill('{"z":1,"a":2}');
-    
-    await page.click('button:has-text("Format")');
-    
+    const editor = page.locator('.monaco-editor')
+    await editor.fill('{"z":1,"a":2}')
+
+    await page.click('button:has-text("Format")')
+
     // Verify formatted output
-    await expect(editor).toContainText('"a": 2');
-  });
-});
+    await expect(editor).toContainText('"a": 2')
+  })
+})
 ```
 
 ### Visual Regression Testing
@@ -151,15 +151,15 @@ test.describe('Home Page', () => {
 ```typescript
 // ✅ Good - visual snapshot testing
 test('should match visual snapshot', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveScreenshot('home-content.png');
-});
+  await page.goto('/')
+  await expect(page).toHaveScreenshot('home-content.png')
+})
 
 test('should match title snapshot', async ({ page }) => {
-  await page.goto('/');
-  const title = page.locator('h1');
-  await expect(title).toHaveScreenshot('title.png');
-});
+  await page.goto('/')
+  const title = page.locator('h1')
+  await expect(title).toHaveScreenshot('title.png')
+})
 ```
 
 ### Waiting for Elements
@@ -167,14 +167,14 @@ test('should match title snapshot', async ({ page }) => {
 ```typescript
 // ✅ Good - wait for element to be ready
 test('should load editor', async ({ page }) => {
-  await page.goto('/');
-  
+  await page.goto('/')
+
   // Wait for Monaco editor to initialize
-  await page.waitForSelector('.monaco-editor', { state: 'visible' });
-  
+  await page.waitForSelector('.monaco-editor', { state: 'visible' })
+
   // Now interact with the editor
-  await page.click('.monaco-editor');
-});
+  await page.click('.monaco-editor')
+})
 ```
 
 ## Test Coverage
@@ -187,7 +187,7 @@ test('should load editor', async ({ page }) => {
 
 ```bash
 # Run unit tests with coverage
-yarn test:unit --coverage
+yarn test --coverage
 
 # Run E2E tests
 yarn test:e2e
@@ -199,13 +199,13 @@ yarn test:e2e
 
 ```bash
 # Unit tests
-yarn test:unit
+yarn test
 
 # E2E tests
 yarn test:e2e
 
 # All tests
-yarn test:unit && yarn test:e2e
+yarn test && yarn test:e2e
 ```
 
 ## Summary
@@ -231,4 +231,4 @@ yarn test:unit && yarn test:e2e
 
 - Unit Tests: `vitest`
 - E2E Tests: `playwright`
-- Commands: `yarn test:unit`, `yarn test:e2e`
+- Commands: `yarn test`, `yarn test:e2e`

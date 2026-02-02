@@ -317,5 +317,5 @@ return <div>Content</div>
 - Prettier: `yarn format`
 - ESLint: `yarn lint`
 - Type Check: `yarn build`
-- Unit Tests: `yarn test:unit`
+- Unit Tests: `yarn test`
 - E2E Tests: `yarn test:e2e`
