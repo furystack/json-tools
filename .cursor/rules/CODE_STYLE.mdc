@@ -72,17 +72,17 @@ frontend/src/pages/Home.tsx
 
 #### Test Files
 
-- **Same name as source** with `.spec.ts` suffix
+- **Same name as source** with `.test.ts` suffix
 - Co-located with source file when possible
 
 ```
 ✅ Good:
 frontend/src/environment-options.ts
-frontend/src/environment-options.spec.ts
+frontend/src/environment-options.test.ts
 
 ❌ Avoid:
-test/environment-options.spec.ts (not co-located)
-frontend/src/environment-options.test.ts (use .spec.ts)
+test/environment-options.test.ts (not co-located)
+frontend/src/environment-options.spec.ts (use .test.ts)
 ```
 
 ### Components and Classes

@@ -22,7 +22,8 @@ export const ValidatePage = Shade({
       justifyContent: 'flex-end',
     },
   },
-  render: ({ injector, useObservable, element, useSearchState }) => {
+  render: ({ injector, useObservable, useRef, useSearchState }) => {
+    const containerRef = useRef<HTMLDivElement>('container')
     const locationService = injector.getInstance(LocationService)
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
@@ -31,9 +32,9 @@ export const ValidatePage = Shade({
       locationService.useSearchParam('value', JSON.stringify({ value: 'Enter a value to verify' }, undefined, 2)),
       {
         onChange: (newValue) => {
-          const editorInstance = element.querySelector<HTMLElement & { editorInstance?: editor.IStandaloneCodeEditor }>(
-            'monaco-editor',
-          )?.editorInstance
+          const editorInstance = containerRef.current?.querySelector<
+            HTMLElement & { editorInstance?: editor.IStandaloneCodeEditor }
+          >('monaco-editor')?.editorInstance
           const pos = editorInstance?.getPosition()
           editorInstance?.setValue(newValue)
 
@@ -48,9 +49,9 @@ export const ValidatePage = Shade({
 
     const [, setJsonSchema] = useObservable('schema', locationService.useSearchParam('jsonSchema', ''), {
       onChange: (newValue) => {
-        const editorInstance = element.querySelector<HTMLElement & { editorInstance?: editor.IStandaloneCodeEditor }>(
-          'monaco-editor',
-        )?.editorInstance
+        const editorInstance = containerRef.current?.querySelector<
+          HTMLElement & { editorInstance?: editor.IStandaloneCodeEditor }
+        >('monaco-editor')?.editorInstance
         const oldModel = editorInstance?.getModel()
 
         const uri = modelProvider.getModelUriForEntityType({
@@ -73,7 +74,7 @@ export const ValidatePage = Shade({
       : undefined
 
     return (
-      <div className="page-container">
+      <div className="page-container" ref={containerRef}>
         <MonacoEditor
           value={value}
           onValueChange={(newValue) => setValue(newValue)}
@@ -82,7 +83,6 @@ export const ValidatePage = Shade({
             language: 'json',
             automaticLayout: true,
             readOnly: false,
-            theme: 'vs-dark',
           }}
         />
 

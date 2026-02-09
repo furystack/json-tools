@@ -1,6 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Modal, Paper, fadeIn, fadeOut } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import { MonacoEditor } from './monaco/monaco-editor.js'
 
 type JsonSchemaSelectorProps = {
@@ -16,9 +15,9 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
       marginRight: '8px',
     },
   },
-  render: ({ props, useDisposable }) => {
-    const isVisible = useDisposable('isVisible', () => new ObservableValue(false))
-    const value = useDisposable('value', () => new ObservableValue(props.schema))
+  render: ({ props, useState }) => {
+    const [isVisible, setIsVisible] = useState('isVisible', false)
+    const [value, setValue] = useState('value', props.schema)
 
     return (
       <>
@@ -26,17 +25,16 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
           title="Edit JSON schema"
           variant="outlined"
           onclick={() => {
-            isVisible.setValue(true)
+            setIsVisible(true)
           }}
         >
           <i className="material-symbols-outlined">data_object</i>
           Schema
         </Button>
         <Modal
-          title="Select JSON Schema"
           isVisible={isVisible}
           onClose={() => {
-            isVisible.setValue(false)
+            setIsVisible(false)
           }}
           backdropStyle={{
             background: 'rgba(128,128,128, 0.3)',
@@ -54,33 +52,33 @@ export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
               onclick={(ev) => ev.stopPropagation()}
               onkeyup={(ev) => {
                 if (ev.key === 'Escape') {
-                  isVisible.setValue(false)
+                  setIsVisible(false)
                 }
               }}
             >
               <h5>Edit JSON schema</h5>
               <MonacoEditor
-                value={value.getValue()}
+                value={value}
                 options={{
                   automaticLayout: true,
                   language: 'json',
                 }}
                 onValueChange={(newValue) => {
-                  value.setValue(newValue)
+                  setValue(newValue)
                 }}
               />
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: '.5em' }}>
                 <Button
                   onclick={() => {
-                    isVisible.setValue(false)
+                    setIsVisible(false)
                   }}
                 >
                   Close
                 </Button>
                 <Button
                   onclick={() => {
-                    props.onSchemaChange(value.getValue())
-                    isVisible.setValue(false)
+                    props.onSchemaChange(value)
+                    setIsVisible(false)
                   }}
                 >
                   Apply
