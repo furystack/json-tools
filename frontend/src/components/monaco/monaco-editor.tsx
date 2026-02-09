@@ -27,10 +27,11 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
 
     useDisposable('editorLifecycle', () => {
       let editorInstance: editor.IStandaloneCodeEditor | null = null
+      let isDisposed = false
       const disposables: Array<{ [Symbol.dispose](): void }> = []
 
       queueMicrotask(() => {
-        if (!containerRef.current) return
+        if (isDisposed || !containerRef.current) return
 
         editorInstance = editor.create(containerRef.current, {
           ...props.options,
@@ -40,7 +41,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
         })
 
         editorInstance.onDidScrollChange(() => {
-          scrollService.emit('onScroll', { top: editorInstance!.getScrollTop() === 0 })
+          scrollService.emit('onScroll', { top: editorInstance?.getScrollTop() === 0 })
         })
 
         disposables.push(
@@ -52,7 +53,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
         )
 
         editorInstance.onDidChangeModelContent(() => {
-          props.onValueChange?.(editorInstance!.getValue())
+          props.onValueChange?.(editorInstance?.getValue() ?? '')
         })
 
         if (props.modelUri) {
@@ -73,6 +74,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
 
       return {
         [Symbol.dispose]() {
+          isDisposed = true
           disposables.forEach((d) => d[Symbol.dispose]())
           editorInstance?.dispose()
         },

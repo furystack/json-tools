@@ -27,10 +27,11 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
 
     useDisposable('editorLifecycle', () => {
       let editorInstance: editor.IStandaloneDiffEditor | null = null
+      let isDisposed = false
       const disposables: Array<{ [Symbol.dispose](): void }> = []
 
       queueMicrotask(() => {
-        if (!containerRef.current) return
+        if (isDisposed || !containerRef.current) return
 
         editorInstance = editor.createDiffEditor(containerRef.current, {
           ...props.options,
@@ -58,13 +59,13 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
 
         if (props.onOriginalValueChange) {
           editorInstance.getOriginalEditor().onKeyUp(() => {
-            props.onOriginalValueChange?.(editorInstance!.getOriginalEditor().getValue())
+            props.onOriginalValueChange?.(editorInstance?.getOriginalEditor().getValue() ?? '')
           })
         }
 
         if (props.onModifiedValueChange) {
           editorInstance.getModifiedEditor().onKeyUp(() => {
-            props.onModifiedValueChange?.(editorInstance!.getModifiedEditor().getValue())
+            props.onModifiedValueChange?.(editorInstance?.getModifiedEditor().getValue() ?? '')
           })
         }
 
@@ -72,11 +73,11 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
         editorInstance.getOriginalEditor().addAction(orderFieldsAction)
 
         editorInstance.getOriginalEditor().onDidScrollChange(() => {
-          scrollService.emit('onScroll', { top: editorInstance!.getOriginalEditor().getScrollTop() === 0 })
+          scrollService.emit('onScroll', { top: editorInstance?.getOriginalEditor().getScrollTop() === 0 })
         })
 
         editorInstance.getModifiedEditor().onDidScrollChange(() => {
-          scrollService.emit('onScroll', { top: editorInstance!.getModifiedEditor().getScrollTop() === 0 })
+          scrollService.emit('onScroll', { top: editorInstance?.getModifiedEditor().getScrollTop() === 0 })
         })
 
         const hostElement = containerRef.current.parentElement
@@ -87,6 +88,7 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
 
       return {
         [Symbol.dispose]() {
+          isDisposed = true
           disposables.forEach((d) => d[Symbol.dispose]())
           editorInstance?.dispose()
         },
