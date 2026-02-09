@@ -20,7 +20,8 @@ export const ComparePage = Shade({
       justifyContent: 'flex-end',
     },
   },
-  render: ({ injector, useObservable, element }) => {
+  render: ({ injector, useObservable, useRef }) => {
+    const containerRef = useRef<HTMLDivElement>('container')
     const locationService = injector.getInstance(LocationService)
 
     const [original, setOriginal] = useObservable(
@@ -28,8 +29,8 @@ export const ComparePage = Shade({
       locationService.useSearchParam('original', JSON.stringify({ foo: 'bar' }, undefined, 2)),
       {
         onChange: (newValue) => {
-          const originalEditor = element
-            .querySelector<HTMLElement & { editorInstance?: editor.IDiffEditor }>('monaco-diff-editor')
+          const originalEditor = containerRef.current
+            ?.querySelector<HTMLElement & { editorInstance?: editor.IDiffEditor }>('monaco-diff-editor')
             ?.editorInstance?.getOriginalEditor()
           const pos = originalEditor?.getPosition()
           originalEditor?.setValue(newValue)
@@ -44,8 +45,8 @@ export const ComparePage = Shade({
       locationService.useSearchParam('modified', JSON.stringify({ foo: 'baz' }, undefined, 2)),
       {
         onChange: (newValue) => {
-          const modifiedEditor = element
-            .querySelector<HTMLElement & { editorInstance?: editor.IDiffEditor }>('monaco-diff-editor')
+          const modifiedEditor = containerRef.current
+            ?.querySelector<HTMLElement & { editorInstance?: editor.IDiffEditor }>('monaco-diff-editor')
             ?.editorInstance?.getModifiedEditor()
           const pos = modifiedEditor?.getPosition()
           modifiedEditor?.setValue(newValue)
@@ -57,20 +58,17 @@ export const ComparePage = Shade({
     )
 
     return (
-      <div className="page-container">
+      <div className="page-container" ref={containerRef}>
         <MonacoDiffEditor
           originalValue={original}
           modifiedValue={modified}
           onOriginalValueChange={(newOriginalValue) => setOriginal(newOriginalValue)}
           onModifiedValueChange={(newModifiedValue) => setModified(newModifiedValue)}
-          options={
-            {
-              automaticLayout: true,
-              readOnly: false,
-              originalEditable: true,
-              theme: 'vs-dark',
-            } as any
-          }
+          options={{
+            automaticLayout: true,
+            readOnly: false,
+            originalEditable: true,
+          }}
         />
         <div className="actions">
           <ShareButton />

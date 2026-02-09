@@ -1,4 +1,4 @@
-import { Shade } from '@furystack/shades'
+import { Shade, createComponent } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import type { Uri } from 'monaco-editor'
 import 'monaco-editor/esm/vs/editor/editor.main'
@@ -9,66 +9,76 @@ import { darkTheme } from '../../themes/dark.js'
 import { orderFieldsAction } from './order-fields.js'
 import { ScrollService } from '../../services/scroll-service.js'
 
-export interface MonacoEditorProps {
+export type MonacoEditorProps = {
   options: editor.IStandaloneEditorConstructionOptions
   value?: string
   onValueChange?: (value: string) => void
   modelUri?: Uri
 }
+
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
-  constructed: ({ element, props, injector, useState, useDisposable }) => {
+  render: ({ useRef, useDisposable, injector, props, useHostProps }) => {
+    const containerRef = useRef<HTMLDivElement>('container')
     const themeProvider = injector.getInstance(ThemeProviderService)
+    const scrollService = injector.getInstance(ScrollService)
 
-    const [editorInstance] = useState(
-      'editorInstance',
-      editor.create(element as HTMLElement, {
-        ...props.options,
-        theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
-        smoothScrolling: true,
-        scrollBeyondLastLine: false,
-      }),
-    )
+    useHostProps({ style: { display: 'block', height: '100%' } })
 
-    editorInstance.onDidScrollChange(() => {
-      injector.getInstance(ScrollService).emit('onScroll', { top: editorInstance.getScrollTop() === 0 })
-    })
+    useDisposable('editorLifecycle', () => {
+      let editorInstance: editor.IStandaloneCodeEditor | null = null
+      const disposables: Array<{ [Symbol.dispose](): void }> = []
 
-    useDisposable('themeChange', () =>
-      themeProvider.subscribe('themeChanged', () => {
-        editorInstance.updateOptions({
+      queueMicrotask(() => {
+        if (!containerRef.current) return
+
+        editorInstance = editor.create(containerRef.current, {
+          ...props.options,
           theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+          smoothScrolling: true,
+          scrollBeyondLastLine: false,
         })
-      }),
-    )
 
-    editorInstance.onDidChangeModelContent(() => {
-      props.onValueChange?.(editorInstance.getValue())
-    })
+        editorInstance.onDidScrollChange(() => {
+          scrollService.emit('onScroll', { top: editorInstance!.getScrollTop() === 0 })
+        })
 
-    if (props.modelUri) {
-      useDisposable('monacoModelUri', () => {
-        const model = editor.createModel(props.value || '', 'json', props.modelUri)
-        editorInstance.setModel(model)
-        return {
-          [Symbol.dispose]: () => {
-            model.dispose()
-          },
+        disposables.push(
+          themeProvider.subscribe('themeChanged', () => {
+            editorInstance?.updateOptions({
+              theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+            })
+          }),
+        )
+
+        editorInstance.onDidChangeModelContent(() => {
+          props.onValueChange?.(editorInstance!.getValue())
+        })
+
+        if (props.modelUri) {
+          const model = editor.createModel(props.value || '', 'json', props.modelUri)
+          editorInstance.setModel(model)
+          disposables.push({ [Symbol.dispose]: () => model.dispose() })
+        } else {
+          editorInstance.setValue(props.value || '')
+        }
+
+        editorInstance.addAction(orderFieldsAction)
+
+        const hostElement = containerRef.current.parentElement
+        if (hostElement) {
+          Object.assign(hostElement, { editorInstance })
         }
       })
-    } else {
-      editorInstance.setValue(props.value || '')
-    }
 
-    editorInstance.addAction(orderFieldsAction)
+      return {
+        [Symbol.dispose]() {
+          disposables.forEach((d) => d[Symbol.dispose]())
+          editorInstance?.dispose()
+        },
+      }
+    })
 
-    Object.assign(element, { editorInstance })
-
-    return () => editorInstance.dispose()
-  },
-  render: ({ element }) => {
-    element.style.display = 'block'
-    element.style.height = '100%'
-    return null
+    return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
   },
 })
