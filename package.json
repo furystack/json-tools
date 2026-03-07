@@ -36,20 +36,13 @@
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --ext .tsx,.ts --cache --fix",
-      "prettier --write",
-      "git add"
+      "eslint --cache --fix",
+      "prettier --write"
     ],
     "*.{js,jsx}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "scripts": {
@@ -61,6 +54,7 @@
     "lint": "eslint .",
     "bumpVersions": "yarn version check --interactive",
     "applyReleaseChanges": "yarn version apply --all && yarn changelog apply && yarn format",
+    "prepare": "husky",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
