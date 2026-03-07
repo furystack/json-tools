@@ -2,6 +2,7 @@
 
 import eslint from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
+import furystack from '@furystack/eslint-plugin'
 import jsdoc from 'eslint-plugin-jsdoc'
 import playwright from 'eslint-plugin-playwright'
 import tseslint from 'typescript-eslint'
@@ -43,8 +44,11 @@ export default tseslint.config(
     },
     plugins: {
       jsdoc,
+      furystack,
     },
     rules: {
+      ...furystack.configs.recommendedStrict.rules,
+      ...furystack.configs.shadesStrict.rules,
       '@typescript-eslint/no-unused-vars': 'off', // Use Typescript own check for this
       '@typescript-eslint/ban-types': 'off',
       '@typescript-eslint/explicit-member-accessibility': [

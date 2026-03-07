@@ -4,7 +4,7 @@ import { ValidatePage } from '../pages/validate.js'
 import { Home } from '../pages/home.js'
 
 export const Body = Shade({
-  shadowDomName: 'shade-app-body',
+  customElementName: 'shade-app-body',
   render: () => {
     return (
       <NestedRouter

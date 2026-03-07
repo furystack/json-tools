@@ -17,7 +17,7 @@ export type MonacoDiffEditorProps = {
 }
 
 export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
-  shadowDomName: 'monaco-diff-editor',
+  customElementName: 'monaco-diff-editor',
   render: ({ useRef, useDisposable, injector, props, useHostProps }) => {
     const containerRef = useRef<HTMLDivElement>('container')
     const themeProvider = injector.getInstance(ThemeProviderService)

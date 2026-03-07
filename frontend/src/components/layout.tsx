@@ -4,7 +4,7 @@ import { Body } from './body.js'
 import { Header } from './header.js'
 
 export const Layout = Shade({
-  shadowDomName: 'shade-app-layout',
+  customElementName: 'shade-app-layout',
   render: () => {
     return (
       <PageLayout

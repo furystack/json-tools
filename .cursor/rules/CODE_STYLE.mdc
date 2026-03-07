@@ -217,7 +217,7 @@ type MyComponentProps = {
 
 // 3. Component
 export const MyComponent = Shade<MyComponentProps>({
-  shadowDomName: 'my-component',
+  customElementName: 'my-component',
   render: ({ props }) => {
     return <div>{props.title}</div>;
   },

@@ -2,7 +2,7 @@ import { Shade, createComponent } from '@furystack/shades'
 import { Button, NotyService } from '@furystack/shades-common-components'
 
 export const ShareButton = Shade({
-  shadowDomName: 'shade-share-button',
+  customElementName: 'shade-share-button',
   css: {
     '& .material-symbols-outlined': {
       fontSize: 'inherit',
