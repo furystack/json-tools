@@ -17,7 +17,7 @@ export type MonacoEditorProps = {
 }
 
 export const MonacoEditor = Shade<MonacoEditorProps>({
-  shadowDomName: 'monaco-editor',
+  customElementName: 'monaco-editor',
   render: ({ useRef, useDisposable, injector, props, useHostProps }) => {
     const containerRef = useRef<HTMLDivElement>('container')
     const themeProvider = injector.getInstance(ThemeProviderService)

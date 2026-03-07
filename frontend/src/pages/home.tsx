@@ -2,7 +2,7 @@ import { createComponent, NestedRouteLink, Shade } from '@furystack/shades'
 import { Button, Card, CardActions, CardContent, CardHeader, PageContainer } from '@furystack/shades-common-components'
 
 export const Home = Shade({
-  shadowDomName: 'shade-home',
+  customElementName: 'shade-home',
   css: {
     '& .hero': {
       display: 'flex',

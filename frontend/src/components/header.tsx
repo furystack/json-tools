@@ -10,7 +10,7 @@ const AppBarLink = styledShade(ShadeAppBarLink, {
 })
 
 export const Header = Shade({
-  shadowDomName: 'shade-app-header',
+  customElementName: 'shade-app-header',
   render: () => {
     return (
       <AppBar id="header">

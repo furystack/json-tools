@@ -8,7 +8,7 @@ type JsonSchemaSelectorProps = {
 }
 
 export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
-  shadowDomName: 'shade-json-schema-selector',
+  customElementName: 'shade-json-schema-selector',
   css: {
     '& .material-symbols-outlined': {
       fontSize: '1.15em',

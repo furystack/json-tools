@@ -4,7 +4,7 @@ import { MonacoDiffEditor } from '../components/monaco/monaco-diff-editor.js'
 import { ShareButton } from '../components/share-button.js'
 
 export const ComparePage = Shade({
-  shadowDomName: 'shade-compare-page',
+  customElementName: 'shade-compare-page',
   css: {
     '& .page-container': {
       position: 'fixed',

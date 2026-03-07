@@ -6,7 +6,7 @@ import { ShareButton } from '../components/share-button.js'
 import { MonacoModelProvider } from '../services/monaco-model-provider.js'
 
 export const ValidatePage = Shade({
-  shadowDomName: 'shade-validate-page',
+  customElementName: 'shade-validate-page',
   css: {
     '& .page-container': {
       position: 'fixed',

@@ -9,7 +9,7 @@ import {
 } from '@furystack/shades-common-components'
 
 export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
-  shadowDomName: 'theme-switch',
+  customElementName: 'theme-switch',
   css: {
     '& .material-symbols-outlined': {
       fontSize: '1.27em',

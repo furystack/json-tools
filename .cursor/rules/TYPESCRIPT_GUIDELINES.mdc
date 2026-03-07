@@ -94,7 +94,7 @@ type MonacoEditorProps = {
 };
 
 export const MonacoEditor = Shade<MonacoEditorProps>({
-  shadowDomName: 'monaco-editor',
+  customElementName: 'monaco-editor',
   render: ({ props }) => {
     return (
       <div data-testid="editor">
