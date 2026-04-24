@@ -62,7 +62,7 @@ export const Home = Shade({
               </p>
             </CardContent>
             <CardActions>
-              <NestedRouteLink href="/compare">
+              <NestedRouteLink path="/compare">
                 <Button variant="outlined">Open Compare</Button>
               </NestedRouteLink>
             </CardActions>
@@ -81,7 +81,7 @@ export const Home = Shade({
               </p>
             </CardContent>
             <CardActions>
-              <NestedRouteLink href="/validate">
+              <NestedRouteLink path="/validate">
                 <Button variant="outlined">Open Validate</Button>
               </NestedRouteLink>
             </CardActions>
