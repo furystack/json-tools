@@ -1,27 +1,35 @@
-import { createComponent, Shade, styledShade } from '@furystack/shades'
-import { AppBar, Button, AppBarLink as ShadeAppBarLink } from '@furystack/shades-common-components'
+import { createComponent, Shade, styledShade, type ChildrenList } from '@furystack/shades'
+import {
+  AppBar,
+  Button,
+  AppBarLink as ShadeAppBarLink,
+  type AppBarLinkProps,
+} from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
 
-const AppBarLink = styledShade(ShadeAppBarLink, {
-  display: 'flex',
-  gap: '8px',
-})
+const AppBarLink = styledShade(
+  ShadeAppBarLink as unknown as (props: Omit<AppBarLinkProps, 'children'>, children?: ChildrenList) => JSX.Element,
+  {
+    display: 'flex',
+    gap: '8px',
+  },
+)
 
 export const Header = Shade({
   customElementName: 'shade-app-header',
   render: () => {
     return (
       <AppBar id="header">
-        <AppBarLink title="JSON Tools" href="/">
+        <AppBarLink title="JSON Tools" path="/">
           <i className="material-symbols-outlined">data_object</i> JSON Tools
         </AppBarLink>
-        <AppBarLink href="/validate">
+        <AppBarLink path="/validate">
           <i className="material-symbols-outlined">check_circle</i>
           Validate
         </AppBarLink>
-        <AppBarLink href="/compare">
+        <AppBarLink path="/compare">
           <i className="material-symbols-outlined">compare_arrows</i>
           Compare
         </AppBarLink>

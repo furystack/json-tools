@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import 'monaco-editor/esm/vs/editor/editor.main'
+import 'monaco-editor/esm/vs/editor/editor.main.js'
 
 import './worker-config.js'
 import { ThemeProviderService } from '@furystack/shades-common-components'
