@@ -1,5 +1,8 @@
-import { Injectable } from '@furystack/inject'
+import { defineService } from '@furystack/inject'
 import { EventHub } from '@furystack/utils'
 
-@Injectable({ lifetime: 'singleton' })
-export class ScrollService extends EventHub<{ onScroll: { top: boolean } }> {}
+export const ScrollService = defineService({
+  name: 'scrollService',
+  lifetime: 'singleton',
+  factory: () => new EventHub<{ onScroll: { top: boolean } }>(),
+})

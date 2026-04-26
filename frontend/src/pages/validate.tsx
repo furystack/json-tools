@@ -24,8 +24,8 @@ export const ValidatePage = Shade({
   },
   render: ({ injector, useObservable, useRef, useSearchState }) => {
     const containerRef = useRef<HTMLDivElement>('container')
-    const locationService = injector.getInstance(LocationService)
-    const modelProvider = injector.getInstance(MonacoModelProvider)
+    const locationService = injector.get(LocationService)
+    const modelProvider = injector.get(MonacoModelProvider)
 
     const [value, setValue] = useObservable(
       'value',
