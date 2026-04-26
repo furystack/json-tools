@@ -22,7 +22,7 @@ export const ComparePage = Shade({
   },
   render: ({ injector, useObservable, useRef }) => {
     const containerRef = useRef<HTMLDivElement>('container')
-    const locationService = injector.getInstance(LocationService)
+    const locationService = injector.get(LocationService)
 
     const [original, setOriginal] = useObservable(
       'original',

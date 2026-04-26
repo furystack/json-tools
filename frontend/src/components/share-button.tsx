@@ -17,7 +17,7 @@ export const ShareButton = Shade({
         onclick={async () => {
           const url = new URL(location.href)
           await navigator.clipboard.writeText(url.href)
-          injector.getInstance(NotyService).emit('onNotyAdded', {
+          injector.get(NotyService).emit('onNotyAdded', {
             type: 'success',
             title: 'Copied to clipboard',
             body: (

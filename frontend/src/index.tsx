@@ -1,13 +1,12 @@
-import { createComponent, initializeShadeRoot, useCustomSearchStateSerializer } from '@furystack/shades'
-import { useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { Injector } from '@furystack/inject'
-import { getLogger } from '@furystack/logging'
-import { Layout } from './components/layout.js'
-import { environmentOptions } from './environment-options.js'
-import { darkTheme } from './themes/dark.js'
+import { getLogger, useLogging, VerboseConsoleLogger } from '@furystack/logging'
+import { createComponent, initializeShadeRoot, useCustomSearchStateSerializer } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
+import { Layout } from './components/layout.js'
 import { orderFields } from './components/monaco/order-fields.js'
+import { environmentOptions } from './environment-options.js'
+import { darkTheme } from './themes/dark.js'
 import { lightTheme } from './themes/light.js'
 
 const shadeInjector = new Injector()
@@ -50,7 +49,7 @@ export const deserializeQueryString = (fullQueryString: string) => {
 useCustomSearchStateSerializer(shadeInjector, serializeToQueryString, deserializeQueryString)
 
 const themeName = JSON.parse(localStorage.getItem('theme') || '"dark"') || 'dark'
-const themeProviderService = shadeInjector.getInstance(ThemeProviderService)
+const themeProviderService = shadeInjector.get(ThemeProviderService)
 themeProviderService.setAssignedTheme(themeName === 'light' ? lightTheme : darkTheme)
 
 useLogging(shadeInjector, VerboseConsoleLogger)

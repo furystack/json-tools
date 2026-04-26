@@ -2,11 +2,11 @@ import { Shade, createComponent } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import 'monaco-editor/esm/vs/editor/editor.main.js'
 
-import './worker-config.js'
 import { ThemeProviderService } from '@furystack/shades-common-components'
+import { ScrollService } from '../../services/scroll-service.js'
 import { darkTheme } from '../../themes/dark.js'
 import { orderFieldsAction } from './order-fields.js'
-import { ScrollService } from '../../services/scroll-service.js'
+import './worker-config.js'
 
 export type MonacoDiffEditorProps = {
   options: editor.IStandaloneDiffEditorConstructionOptions
@@ -20,8 +20,8 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
   customElementName: 'monaco-diff-editor',
   render: ({ useRef, useDisposable, injector, props, useHostProps }) => {
     const containerRef = useRef<HTMLDivElement>('container')
-    const themeProvider = injector.getInstance(ThemeProviderService)
-    const scrollService = injector.getInstance(ScrollService)
+    const themeProvider = injector.get(ThemeProviderService)
+    const scrollService = injector.get(ScrollService)
 
     useHostProps({ style: { display: 'block', height: '100%' } })
 
