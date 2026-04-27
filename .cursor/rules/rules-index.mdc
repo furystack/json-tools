@@ -1,11 +1,18 @@
 ---
-name: Rules Index
-description: Index of available rules and guidelines
 alwaysApply: true
 ---
 
-This file contains a list of helpful information and context that the agent can reference when working in this codebase. Each entry provides specific guidance or rules for different aspects of the project. You can read these files using the readFile tool if the users prompt seems related.
+Index of repository rules. Read the linked file when its topic is relevant to the user's prompt.
 
-- [Code formatting, naming conventions, and file organization](./CODE_STYLE.mdc)
-- [TypeScript type safety and strict typing guidelines](./TYPESCRIPT_GUIDELINES.mdc)
-- [Unit testing with Vitest and E2E testing with Playwright](./TESTING_GUIDELINES.mdc)
+- [Naming, formatting, imports, file/code organization](./CODE_STYLE.mdc) — auto-applied to all `.ts` / `.tsx`
+- [Type safety, no `any`, generics, type guards, discriminated unions](./TYPESCRIPT_GUIDELINES.mdc) — auto-applied to all `.ts` / `.tsx`
+- [Complexity thresholds for Shade components and services](./COMPLEXITY.mdc) — auto-applied; used in reviews and during implementation
+- [Frontend Shade component patterns](./SHADES_COMPONENTS.mdc) — auto-applied in `frontend/`
+- [Vitest unit + Playwright E2E patterns](./TESTING_GUIDELINES.mdc) — auto-applied to specs
+
+Skills (on-demand workflows):
+
+- `create-shade-component` — author a Shade component with proper hooks, styling, tests
+- `write-tests` — author Vitest unit / Playwright E2E tests
+- `fill-changelog` — fill changelog entries for the current branch
+- `review-changes` — full code review with reviewer subagents

@@ -1,6 +1,6 @@
 ---
 name: Testing Guidelines
-description: Unit testing with Vitest and E2E testing with Playwright
+description: Vitest unit tests + Playwright E2E for the json-tools frontend app
 globs:
   - '**/*.spec.ts'
   - '**/*.spec.tsx'
@@ -10,225 +10,119 @@ alwaysApply: false
 
 # Testing Guidelines
 
-## Unit Testing with Vitest
+Vitest for unit + integration. Playwright for E2E. Specs co-located with source as `*.spec.ts(x)`. E2E in `e2e/<flow>.spec.ts` (or `e2e/<flow>.e2e.spec.ts`).
 
-### Test Structure
+## Workspace
 
-```typescript
-// ✅ Good - clear test structure
-describe('EnvironmentOptions', () => {
-  describe('getEnvironmentOptions', () => {
-    it('should return default options when no URL params', () => {
-      // Arrange
-      const url = new URL('http://localhost')
+Single `frontend` workspace. `vitest.config.mts` runs jsdom tests against `frontend/src/**/*.spec.(ts|tsx)`. Run all with `yarn test`.
 
-      // Act
-      const result = getEnvironmentOptions(url)
+## Disposable safety — wrap everything in `using` / `usingAsync`
 
-      // Assert
-      expect(result.theme).toBe('dark')
-    })
-  })
-})
-```
-
-### Test All Exported Functions
-
-Every exported function should have tests:
+All disposable resources in tests **must** be wrapped. Manual `[Symbol.dispose]()` at the end leaks if the test throws first.
 
 ```typescript
-// ✅ Good - testing public API
-describe('orderFields', () => {
-  it('should order object fields alphabetically', () => {
-    const input = { z: 1, a: 2, m: 3 }
-    const result = orderFields(input)
-    expect(Object.keys(result)).toEqual(['a', 'm', 'z'])
-  })
+import { using, usingAsync } from '@furystack/utils'
+import { createInjector } from '@furystack/inject'
 
-  it('should handle nested objects', () => {
-    const input = { outer: { z: 1, a: 2 } }
-    const result = orderFields(input)
-    expect(Object.keys(result.outer)).toEqual(['a', 'z'])
-  })
-
-  it('should handle empty objects', () => {
-    const result = orderFields({})
-    expect(result).toEqual({})
-  })
+// ✅
+await usingAsync(createInjector(), async (injector) => {
+  const provider = injector.get(MonacoModelProvider)
+  expect(provider.activeSchema.getValue()).toBeNull()
 })
+
+// ❌ leaks on throw
+const injector = createInjector()
+const provider = injector.get(MonacoModelProvider)
+expect(...).toBe(...)
+await injector[Symbol.asyncDispose]()
 ```
 
-### Test Edge Cases
+Common disposables: `Injector`, `ObservableValue`, `Cache`, stores, services that own them.
 
-Test boundary conditions and error scenarios:
+**Exception:** when the test verifies post-dispose behavior itself, manual disposal is required.
+
+## Mocking — minimal, via `injector.bind`
+
+Substitute services with the same mechanism production uses for bootstrap overrides. Avoid `vi.fn()` mocks for FuryStack services.
 
 ```typescript
-// ✅ Good - testing edge cases
-describe('parseJson', () => {
-  it('should handle valid JSON', () => {
-    const result = parseJson('{"key": "value"}')
-    expect(result).toEqual({ key: 'value' })
-  })
-
-  it('should handle invalid JSON', () => {
-    const result = parseJson('invalid')
-    expect(result).toBeNull()
-  })
-
-  it('should handle empty string', () => {
-    const result = parseJson('')
-    expect(result).toBeNull()
-  })
-
-  it('should handle null input', () => {
-    const result = parseJson(null as unknown as string)
-    expect(result).toBeNull()
-  })
+await usingAsync(createInjector(), async (injector) => {
+  injector.bind(MonacoModelProvider, () => ({
+    activeSchema: new ObservableValue(null),
+    setActiveSchema: vi.fn(),
+  }))
+  const consumer = injector.get(SchemaSelectorService)
+  // ...
 })
 ```
 
-### Avoid False Positive Tests
+Use `vi.fn()` only for non-DI externals (e.g. raw `fetch` callbacks).
 
-Ensure assertions always run:
+## When to test null / undefined / "wrong type" inputs
+
+**Rationale:** older guidance asked for blanket null/undefined/error tests on every export. That asserts TypeScript works (which it does) and encourages defensive guards for impossible-by-types inputs. Trust the TS type system; consumers will use it too.
+
+You **MUST** test null / undefined / malformed values when:
+
+- **External boundary, no schema validation upstream** — REST handlers not wrapped in `Validate(...)`, WebSocket message handlers, file parsers, env-var consumers, anything reading `unknown` or `JSON.parse` output. At runtime nothing prevents a bad payload, so the function is the line of defense.
+- **The type signature itself allows the case** — `T | null`, `T | undefined`, `unknown`, `T?`. The function declared the case as legal, so test the documented behavior on each branch.
+
+If a `Validate(...)` (or JSON-schema / zod) wrapper sits ahead of a REST handler, the wrapper covers bad-payload tests — the inner handler should not retest them.
+
+Outside those cases, do **not** add such tests.
+
+## Shade component tests
+
+Frontend project uses `environment: 'jsdom'`. Renders are batched via `queueMicrotask` — await `flushUpdates()` before asserting DOM state.
 
 ```typescript
-// ❌ False positive risk - passes if function doesn't throw
-it('should throw on error', async () => {
-  try {
-    await functionThatShouldThrow()
-  } catch (error) {
-    expect(error).toBeInstanceOf(Error)
-  }
-})
+import { flushUpdates } from '@furystack/shades'
 
-// ✅ Correct - fails if assertions don't run
-it('should throw on error', async () => {
-  expect.assertions(1)
-  try {
-    await functionThatShouldThrow()
-  } catch (error) {
-    expect(error).toBeInstanceOf(Error)
-  }
-})
-
-// ✅ Better - use expect().rejects
-it('should throw on error', async () => {
-  await expect(functionThatShouldThrow()).rejects.toThrow()
+it('updates after state change', async () => {
+  // trigger state change
+  await flushUpdates()
+  expect(element.textContent).toBe('updated')
 })
 ```
 
-## E2E Testing with Playwright
+If a render triggers cascaded updates, await `flushUpdates()` again.
 
-### Page Object Pattern
+## E2E tests (Playwright)
+
+Locate Shade components by their `customElementName`. Use semantic locators inside (`getByRole`, `getByLabel`, `getByText`).
 
 ```typescript
-// e2e/page.spec.ts
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-test.describe('Home Page', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-  })
+test('validates JSON against a schema', async ({ page }) => {
+  await page.goto('/validate')
+  await expect(page.locator('json-schema-selector')).toBeVisible()
 
-  test('should display editor', async ({ page }) => {
-    await expect(page.locator('.monaco-editor')).toBeVisible()
-  })
+  await page.getByRole('combobox', { name: 'Schema' }).selectOption('person')
+  await page.locator('monaco-editor').click()
+  await page.keyboard.type('{"name":"Ada","age":30}')
 
-  test('should format JSON on button click', async ({ page }) => {
-    const editor = page.locator('.monaco-editor')
-    await editor.fill('{"z":1,"a":2}')
-
-    await page.click('button:has-text("Format")')
-
-    // Verify formatted output
-    await expect(editor).toContainText('"a": 2')
-  })
+  await expect(page.locator('[data-testid="validation-result"]')).toContainText('Valid')
 })
 ```
 
-### Visual Regression Testing
+Prefer Playwright's auto-wait (`expect(...).toBeVisible()`) over `waitForSelector`.
 
-```typescript
-// ✅ Good - visual snapshot testing
-test('should match visual snapshot', async ({ page }) => {
-  await page.goto('/')
-  await expect(page).toHaveScreenshot('home-content.png')
-})
+## False-positive guards
 
-test('should match title snapshot', async ({ page }) => {
-  await page.goto('/')
-  const title = page.locator('h1')
-  await expect(title).toHaveScreenshot('title.png')
-})
-```
+- Assertions inside `try/catch` → use `expect.assertions(N)` so the test fails if the function unexpectedly resolves.
+- Assertions inside `.forEach` / `.map` callbacks → same risk.
+- Async assertions without `await` → promise resolves after the test completes.
+- Mocks that always succeed → make at least one test exercise failure.
 
-### Waiting for Elements
+## Commands
 
-```typescript
-// ✅ Good - wait for element to be ready
-test('should load editor', async ({ page }) => {
-  await page.goto('/')
-
-  // Wait for Monaco editor to initialize
-  await page.waitForSelector('.monaco-editor', { state: 'visible' })
-
-  // Now interact with the editor
-  await page.click('.monaco-editor')
-})
-```
-
-## Test Coverage
-
-### Coverage Requirements
-
-- **Exported functions**: 100% coverage required
-- **Components**: Key render paths covered
-- **E2E**: Critical user flows covered
-
-```bash
-# Run unit tests with coverage
-yarn test --coverage
-
-# Run E2E tests
-yarn test:e2e
-```
-
-## Running Tests
-
-### Available Commands
-
-```bash
-# Unit tests
-yarn test
-
-# E2E tests
-yarn test:e2e
-
-# All tests
-yarn test && yarn test:e2e
-```
-
-## Summary
-
-**Key Principles:**
-
-1. **Test all exported APIs** - 100% coverage for exports
-2. **Test edge cases** - Null, undefined, errors, empty states
-3. **Avoid false positives** - Use `expect.assertions()` when needed
-4. **E2E for critical flows** - Test main user journeys
-5. **Visual regression** - Snapshot testing for UI
-6. **Clear test structure** - describe > describe > it
-
-**Testing Checklist:**
-
-- [ ] All exported functions have tests
-- [ ] Edge cases tested (null, undefined, errors)
-- [ ] Error paths tested
-- [ ] E2E tests cover critical user flows
-- [ ] Visual snapshots updated when UI changes
-
-**Tools:**
-
-- Unit Tests: `vitest`
-- E2E Tests: `playwright`
-- Commands: `yarn test`, `yarn test:e2e`
+| Purpose | Command |
+|---|---|
+| All unit tests | `yarn test` |
+| Coverage | `yarn test --coverage` |
+| Watch | `yarn test --watch` |
+| All E2E | `yarn test:e2e` |
+| One E2E spec | `yarn playwright test e2e/<file>` |
+| Headed E2E | `yarn playwright test --headed` |
+| Debug E2E | `yarn playwright test --debug` |
