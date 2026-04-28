@@ -1,6 +1,6 @@
 ---
 name: TypeScript Guidelines
-description: TypeScript type safety and strict typing guidelines
+description: Type safety, strict typing, no `any`, generics, type guards for the json-tools frontend app
 globs:
   - '**/*.ts'
   - '**/*.tsx'
@@ -9,258 +9,139 @@ alwaysApply: true
 
 # TypeScript Guidelines
 
-## Type Safety
+## Public API
 
-### NEVER use `any`
-
-There are no acceptable uses of `any` in this codebase:
-
-```typescript
-// ✅ Good - use unknown for truly unknown types
-export function processData(data: unknown): string {
-  if (typeof data === 'string') {
-    return data;
-  }
-  return JSON.stringify(data);
-}
-
-// ✅ Good - use generics for flexible types
-export function identity<T>(value: T): T {
-  return value;
-}
-
-// ❌ FORBIDDEN - using any
-export function processData(data: any): string {
-  return data.toString();
-}
-```
-
-### Explicit Types for Public APIs
-
-All exported functions and public methods should have explicit types:
+- All exports have explicit types (params + return).
+- Generic params have constraints + descriptive names (`TUser`, `TResult` — not `T`, `R`).
+- Prefer `type` over `interface`. No `I` prefix, no `Type` suffix.
 
 ```typescript
-// ✅ Good - explicit types
-export function getEnvironmentOptions(): EnvironmentOptions {
-  // Implementation
-}
+// ✅
+export const MonacoModelProvider = defineService({
+  name: 'app/MonacoModelProvider',
+  lifetime: 'singleton',
+  factory: (): MonacoModelProvider => ({ /* ... */ }),
+})
 
-export class EditorService {
-  public formatJson(input: string): string {
-    // Implementation
-  }
-}
-
-// ❌ Avoid - implicit return types for public APIs
-export function getEnvironmentOptions() {
-  // Return type is inferred - not ideal for public APIs
-}
+// ❌ implicit return type, single-letter generic
+export function fetchData<T>(url) { return fetch(url) }
 ```
 
-## Type Definitions
+## NO `any` — one exception
 
-### Prefer `type` over `interface`
+`any` forbidden in values, params, return types. **Exception:** generic constraint position when variance breaks `unknown` inference (e.g. callback param positions).
 
 ```typescript
-// ✅ Good
-type EditorOptions = {
-  theme: 'light' | 'dark';
-  fontSize: number;
-};
+// ✅ unknown for truly unknown
+const process = (data: unknown): string =>
+  typeof data === 'string' ? data : JSON.stringify(data)
 
-type JsonResult<T> = {
-  data: T;
-  valid: boolean;
-};
+// ✅ any only allowed in constraint position
+type ExtractPaths<T extends Record<string, NestedRoute<any>>> = { /* ... */ }
 
-// ❌ Avoid
-interface EditorOptions {
-  theme: string;
-  fontSize: number;
-}
+// ❌ any anywhere else
+export function process(data: any): string { return data.toString() }
 ```
 
-### Component Props Types
+Alternatives: `unknown` + type guard, generics, union types, utility types.
 
-Define explicit prop types for all components:
+`@typescript-eslint/no-explicit-any` is **disabled** in `eslint.config.js` because the rule has no option for the constraint-position exception. Reviewers enforce the rule in code review.
+
+## Inference
+
+Let TS infer internally. Be explicit at API boundaries, complex switch/case, or when inference is ambiguous.
 
 ```typescript
-// ✅ Good - explicit props type
-type MonacoEditorProps = {
-  value: string;
-  onChange?: (value: string) => void;
-  language?: string;
-  readOnly?: boolean;
-};
+// ✅ inferred internally
+const users = ['Alice', 'Bob']
+const count = users.length
 
-export const MonacoEditor = Shade<MonacoEditorProps>({
-  customElementName: 'monaco-editor',
-  render: ({ props }) => {
-    return (
-      <div data-testid="editor">
-        {/* Editor implementation */}
-      </div>
-    );
-  },
-});
+// ✅ explicit at exports
+export const getUserById = async (id: string): Promise<User | null> => { /* ... */ }
+
+// ❌ noisy
+const count: number = 5
 ```
 
-## Type Guards
+## Type guards
 
-### Provide Type Guards for Runtime Checks
+Use guards for runtime checks. Use them, not type assertions.
 
 ```typescript
-// ✅ Good - type guard
-export function isValidJson(value: unknown): value is object {
-  if (typeof value !== 'string') return false;
-  try {
-    JSON.parse(value);
-    return true;
-  } catch {
-    return false;
-  }
-}
+// ✅
+export const isJsonObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
 
-// Usage
-if (isValidJson(data)) {
-  console.log('Valid JSON');
-}
+const isNonNullable = <T>(value: T | null | undefined): value is T =>
+  value !== null && value !== undefined
+
+values.filter(isNonNullable) // type-narrowed
 ```
 
-## Observable Types
+## Discriminated unions
 
-### Type Observable Values
-
-Always provide explicit types for ObservableValue:
+For multi-state values. Always include a `status` / `kind` discriminator.
 
 ```typescript
-// ✅ Good - explicit observable type
-public currentTheme = new ObservableValue<'light' | 'dark'>('dark');
-public isLoading = new ObservableValue<boolean>(false);
-public editorContent = new ObservableValue<string>('');
+// ✅
+type ValidationState =
+  | { status: 'idle' }
+  | { status: 'validating' }
+  | { status: 'valid'; document: unknown }
+  | { status: 'invalid'; errors: ValidationError[] }
 
-// ❌ Avoid - relying on inference for complex types
-public currentTheme = new ObservableValue(null); // Type is ObservableValue<null>
+// ❌ no discriminator → cannot narrow
+type Bad = { validating: boolean; errors?: ValidationError[]; document?: unknown }
 ```
 
-## Generic Patterns
+## Observable typing
 
-### Use Descriptive Generic Names
+`ObservableValue<T>` is invariant — provide explicit `T`, especially for nullable / union states.
 
 ```typescript
-// ✅ Good - descriptive generic names
-type JsonParseResult<TData> = {
-  data: TData;
-  valid: boolean;
-  error?: string;
-};
+// ✅
+public activeSchema = new ObservableValue<JsonSchema | null>(null)
+public state = new ObservableValue<ValidationState>({ status: 'idle' })
 
-// ❌ Avoid - unclear generic names
-type JsonParseResult<T> = {
-  data: T;
-  valid: boolean;
-};
+// ❌ inference widens to ObservableValue<null>
+public activeSchema = new ObservableValue(null)
 ```
 
-### Constrain Generics When Appropriate
+## Assertions
+
+Avoid. Use type guards or `as const` instead.
 
 ```typescript
-// ✅ Good - constrained generic
-export function formatValue<T extends string | number | boolean>(value: T): string {
-  return String(value);
-}
+// ✅ as const for literal types
+const colors = ['red', 'green', 'blue'] as const
+type Color = (typeof colors)[number]
+
+// ✅ assertion only when DOM API leaves no choice
+const el = document.getElementById('x') as HTMLInputElement | null
+
+// ❌ dangerous
+const user = unknownValue as User       // prefer guard
+const x = maybe!                        // prefer optional chaining
 ```
 
-## Strict Null Checks
+Avoid `!` non-null assertion. Prefer `?.` and `??`.
 
-### Handle Null and Undefined Explicitly
+## Utility types
 
-```typescript
-// ✅ Good - explicit null handling
-export function parseJson(input: string): object | null {
-  try {
-    return JSON.parse(input);
-  } catch {
-    return null;
-  }
-}
+Reuse built-ins (`Partial`, `Pick`, `Omit`, `Record`, `Required`, `Readonly`). Export project-specific helpers when reused 2+ times.
 
-// ✅ Good - use optional chaining
-const theme = options?.theme ?? 'dark';
+## Double-cast anti-pattern
 
-// ❌ Avoid - ignoring potential null
-const theme = options.theme; // Error if options is null
-```
+Never `as unknown as T`. If you need a cast that strong, you're missing a type guard or a generic. Refactor.
 
-## Utility Types
+## Checklist (public API)
 
-### Use TypeScript Utility Types
+- [ ] No `any` (except generic constraint exception)
+- [ ] Explicit types on all exports
+- [ ] Generic params named & constrained
+- [ ] Type guards for runtime checks
+- [ ] Discriminated unions for multi-state
+- [ ] No `as unknown as T`, no `!` non-null
+- [ ] `ObservableValue` types explicit
 
-```typescript
-// ✅ Good - using utility types
-type EditorOptions = {
-  theme: 'light' | 'dark';
-  fontSize: number;
-  language: string;
-};
-
-// Partial for optional fields
-type PartialEditorOptions = Partial<EditorOptions>;
-
-// Pick for specific fields
-type ThemeOption = Pick<EditorOptions, 'theme'>;
-
-// Omit for excluding fields
-type EditorWithoutTheme = Omit<EditorOptions, 'theme'>;
-```
-
-## Type Inference
-
-### Let TypeScript Infer When Possible
-
-```typescript
-// ✅ Good - let TypeScript infer internal types
-const users = ['Alice', 'Bob', 'Charlie']; // Inferred as string[]
-const count = users.length; // Inferred as number
-
-// ✅ Good - explicit for complex conditional logic
-export const getStatusDisplay = (status: string): JSX.Element | null => {
-  switch (status) {
-    case 'valid':
-      return <div>Valid</div>;
-    case 'invalid':
-      return <div>Invalid</div>;
-    default:
-      return null;
-  }
-};
-
-// ❌ Avoid - unnecessary annotations
-const count: number = 5;
-const name: string = 'John';
-```
-
-## Summary
-
-**Key Principles:**
-
-1. **NEVER use `any`** - Use `unknown`, generics, or proper types
-2. **Explicit types for exports** - Document the contract
-3. **Prefer `type` over `interface`**
-4. **Type component props** - Every Shade component should have typed props
-5. **Type observables** - Always provide explicit types for ObservableValue
-6. **Handle nulls** - Use strict null checks and optional chaining
-7. **Use type guards** - For runtime type checking
-
-**Type Safety Checklist:**
-
-- [ ] No `any` types anywhere
-- [ ] All exported functions have explicit return types
-- [ ] Component props are typed
-- [ ] Observable values have explicit types
-- [ ] Null/undefined handled explicitly
-
-**Tools:**
-
-- Type checking: `yarn build`
-- Strict mode: Enabled in `tsconfig.json`
+Tools: `yarn build`, strict mode is on.

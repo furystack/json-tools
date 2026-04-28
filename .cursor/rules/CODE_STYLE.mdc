@@ -1,321 +1,192 @@
 ---
-name: Code Style Guidelines
-description: Code formatting, naming conventions, and file organization
+name: Code Style
+description: Naming, formatting, imports, file/code organization for the json-tools frontend app
 globs:
   - '**/*.ts'
   - '**/*.tsx'
 alwaysApply: true
 ---
 
-# Code Style Guidelines
+# Code Style
 
-## Formatting Standards
+Prettier + ESLint enforced. Run `yarn prettier` and `yarn lint`. Generate code that satisfies `@furystack/eslint-plugin` from the start — don't rely on the linter to catch violations.
 
-### Prettier Configuration
+## Naming
 
-This project uses Prettier for code formatting. **Always use the project's Prettier configuration**.
+| Kind | Convention | Example |
+|---|---|---|
+| File | kebab-case `.ts` / `.tsx` | `session.ts`, `theme-switch.tsx` |
+| Spec | co-located, `.spec.ts` / `.spec.tsx` | `session.spec.ts` |
+| E2E spec | `e2e/<flow>.e2e.spec.ts` | `e2e/page.spec.ts` |
+| Class / type / component / service token | PascalCase | `MonacoModelProvider`, `ScrollService` |
+| Function / variable | camelCase, verb-led | `getCurrentUser`, `validateEmail` |
+| Constant | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| Boolean | `is*` / `has*` / `should*` / `can*` prefix | `isAuthenticated` |
+| Event handler (internal) | `handle*` | `handleSubmit` |
+| Event prop callback | `on*` | `onSave` |
+| Type alias | prefer `type` over `interface`. No `I` prefix, no `Type` suffix | `type User = { ... }` |
+| Component props | PascalCase + `Props` suffix | `type LoginFormProps` |
+| Shade element name | kebab-case, unique, namespaced | `customElementName: 'shade-login'` |
 
-**Configuration file:** `prettier.config.js`
+## Imports
 
-```bash
-# Format code
-yarn format
+Order, blank line between groups:
 
-# Check formatting
-yarn format:check
-```
-
-### ESLint Configuration
-
-This project uses ESLint for code quality. **Always use the project's ESLint configuration**.
-
-**Configuration file:** `eslint.config.js`
-
-```bash
-# Lint code
-yarn lint
-```
-
-### Automated Formatting
-
-Code is automatically formatted on commit via Husky and lint-staged:
-
-```json
-{
-  "lint-staged": {
-    "*.{ts,tsx}": ["eslint --ext .tsx,.ts --cache --fix", "prettier --write", "git add"]
-  }
-}
-```
-
-## Naming Conventions
-
-### Files and Directories
-
-#### Source Files
-
-- **kebab-case** for all files
-- `.ts` for TypeScript, `.tsx` for JSX components
-- One main export per file
-
-```
-✅ Good:
-frontend/src/components/theme-switch/index.tsx
-frontend/src/services/session.ts
-frontend/src/pages/home.tsx
-
-❌ Avoid:
-frontend/src/components/ThemeSwitch.tsx
-frontend/src/services/Session.ts
-frontend/src/pages/Home.tsx
-```
-
-#### Test Files
-
-- **Same name as source** with `.test.ts` suffix
-- Co-located with source file when possible
-
-```
-✅ Good:
-frontend/src/environment-options.ts
-frontend/src/environment-options.test.ts
-
-❌ Avoid:
-test/environment-options.test.ts (not co-located)
-frontend/src/environment-options.spec.ts (use .test.ts)
-```
-
-### Components and Classes
-
-- **PascalCase** for components, classes, and types
-- Descriptive and clear purpose
+1. Node built-ins
+2. External deps
+3. `@furystack/*` packages
+4. Workspace packages (`common`)
+5. Relative imports
+6. Type-only imports last in each group
 
 ```typescript
-// ✅ Good
-export const ThemeSwitch = Shade(...)
-export const MonacoEditor = Shade(...)
-export type EditorOptions = {}
+import { join } from 'path'
 
-// ❌ Avoid
-export const themeSwitch = Shade(...) // Wrong case
-export const editor = Shade(...) // Too generic
+import { defineService } from '@furystack/inject'
+import { Shade } from '@furystack/shades'
+
+import { ScrollService } from '../services/scroll-service.js'
+import type { JsonSchemaSelectorProps } from './types.js'
 ```
 
-### Functions and Variables
+Group same-package imports together. Sort alphabetically when many.
 
-- **camelCase** for functions and variables
-- **UPPER_SNAKE_CASE** for constants
-
-```typescript
-// ✅ Good
-export function getEnvironmentOptions() {}
-export const isValidJson = true
-export const DEFAULT_THEME = 'dark'
-
-// ❌ Avoid
-export function GetEnvironmentOptions() {}
-export const IsValidJson = true
-```
-
-## Project Structure
-
-### Directory Organization
+## Workspace layout
 
 ```
 json-tools/
-├── frontend/                # Frontend application
+├── frontend/                    # Shades app (single workspace)
 │   └── src/
-│       ├── index.tsx        # App entry point
-│       ├── components/      # Reusable components
-│       │   ├── header.tsx
-│       │   ├── body.tsx
-│       │   ├── layout.tsx
-│       │   ├── theme-switch/
-│       │   │   └── index.tsx
-│       │   ├── github-logo/
-│       │   │   ├── index.tsx
-│       │   │   ├── gh-dark.png
-│       │   │   └── gh-light.png
-│       │   └── monaco/
-│       │       ├── monaco-editor.tsx
-│       │       └── monaco-diff-editor.tsx
-│       ├── pages/           # Page components
-│       │   ├── home.tsx
-│       │   ├── compare.tsx
-│       │   └── validate.tsx
-│       ├── services/        # Frontend services
-│       └── themes/          # Theme definitions
-└── e2e/                     # End-to-end tests
-    └── page.spec.ts
+│       ├── components/<x>.tsx   # leaf components
+│       ├── components/<x>/index.tsx + assets
+│       ├── pages/<x>.tsx        # route targets (compare, validate, home)
+│       └── services/<x>.ts      # frontend services (defineService)
+└── e2e/                         # Playwright specs
 ```
 
-### Component File Structure
+Use `.js` import suffix on relative paths (NodeNext ESM). No backend service or `common` workspace.
 
-Components should be organized in directories when they have assets:
-
-```
-components/
-├── theme-switch/
-│   └── index.tsx           # Component with no assets
-├── github-logo/
-│   ├── index.tsx           # Component
-│   ├── gh-dark.png         # Dark theme asset
-│   └── gh-light.png        # Light theme asset
-└── header.tsx              # Simple component (no directory needed)
-```
-
-## Import Ordering
-
-### Import Order
-
-1. **Node built-ins**
-2. **External dependencies** (npm packages)
-3. **FuryStack packages** (`@furystack/*`)
-4. **Relative imports**
-5. **Type imports** (if separated)
+## File structure
 
 ```typescript
-// ✅ Good - organized imports
-import { EventEmitter } from 'events'
+// 1. imports
+import { defineService } from '@furystack/inject'
 
-import { Shade } from '@furystack/shades'
-import { Injector } from '@furystack/inject'
+// 2. types
+type SessionState = 'initializing' | 'unauthenticated' | 'authenticated'
 
-import { MonacoEditor } from '../components/monaco/monaco-editor.js'
-import type { EditorOptions } from './types.js'
+// 3. constants
+const DEFAULT_TIMEOUT_MS = 5000
 
-// ❌ Avoid - random ordering
-import { MonacoEditor } from '../components/monaco/monaco-editor.js'
-import { EventEmitter } from 'events'
-import { Injector } from '@furystack/inject'
+// 4. helpers
+const formatError = (err: unknown): string =>
+  err instanceof Error ? err.message : 'Unknown error'
+
+// 5. main export
+export const ScrollService = defineService({
+  name: 'app/ScrollService',
+  lifetime: 'singleton',
+  factory: ({ onDispose }) => { /* ... */ },
+})
 ```
 
-### Import Grouping
+## Service / component structure
 
-Separate import groups with blank lines:
-
-```typescript
-// ✅ Good - separated groups
-import { Injector } from '@furystack/inject'
-import { Shade } from '@furystack/shades'
-
-import { MonacoEditor } from './components/monaco/monaco-editor.js'
-```
-
-## Code Organization
-
-### Component File Structure
+Component render order: services → host props → refs → observable subscriptions → local state → handlers → JSX.
 
 ```typescript
-// 1. Imports
-import { Shade } from '@furystack/shades';
+export const JsonSchemaSelector = Shade<JsonSchemaSelectorProps>({
+  customElementName: 'json-schema-selector',
+  render: ({ props, injector, useObservable, useState }) => {
+    const monacoModels = injector.get(MonacoModelProvider)
+    const [schema] = useObservable('schema', monacoModels.activeSchema)
+    const [draft, setDraft] = useState('draft', '')
 
-// 2. Types
-type MyComponentProps = {
-  title: string;
-};
+    const handleSave = () => { /* ... */ }
 
-// 3. Component
-export const MyComponent = Shade<MyComponentProps>({
-  customElementName: 'my-component',
-  render: ({ props }) => {
-    return <div>{props.title}</div>;
+    return <div>{/* ... */}</div>
   },
-});
+})
 ```
 
-### Service File Structure
+## JSX
 
-```typescript
-// 1. Imports
-import { Injectable, Injected } from '@furystack/inject'
-import { ObservableValue } from '@furystack/utils'
-
-// 2. Types
-type ServiceState = {
-  data: string
-}
-
-// 3. Service class
-@Injectable({ lifetime: 'singleton' })
-export class MyService {
-  // Injected dependencies
-  @Injected(OtherService)
-  declare private otherService: OtherService
-
-  // Observable state
-  public state = new ObservableValue<ServiceState | null>(null)
-
-  // Public methods
-  public getData(): string {
-    return this.state.getValue()?.data ?? ''
-  }
-}
-```
-
-## JSX/TSX Code Style
-
-### JSX Formatting
+Multi-line for >2 attrs. Single-line for trivial cases. No nested ternaries — use early returns for >2 branches.
 
 ```tsx
-// ✅ Good - multi-line for readability
-<button
-  type="button"
-  onclick={handleClick}
-  style={{ padding: '8px 16px' }}
->
-  Save Changes
+// ✅
+<button type="button" onclick={handleClick} style={{ padding: '8px' }}>
+  Save
 </button>
 
-// ✅ Good - single line for simple cases
-<button onclick={handleClick}>Save</button>
-
-// ❌ Avoid - hard to read
-<button type="button" onclick={handleClick} style={{ padding: '8px 16px' }}>Save Changes</button>
+// ❌ nested ternary
+{isLoading ? <Loading /> : error ? <Err /> : <Content />}
 ```
 
-### Conditional Rendering
+## JSDoc
 
-```tsx
-// ✅ Good - logical AND for simple cases
-{
-  isLoading && <div>Loading...</div>
-}
+Required on exported services / components / endpoints. For internal symbols, JsDoc is optional — only add it when it passes the value test below.
 
-// ✅ Good - ternary for if-else
-{
-  isLoading ? <div>Loading...</div> : <div>Content</div>
-}
+### Value test
 
-// ✅ Good - early return for complex cases
-if (isLoading) return <div>Loading...</div>
-if (error) return <div>Error: {error}</div>
-return <div>Content</div>
+Before writing or keeping JsDoc, strip the type signature mentally and read the JsDoc alone. If it still tells the reader something the type does not, keep it. If it just narrates the type, delete it.
 
-// ❌ Avoid - nested ternaries
-{
-  isLoading ? <div>Loading...</div> : error ? <div>Error</div> : <div>Content</div>
-}
+Keep when JsDoc explains:
+
+- **Intent** — why this exists, what problem it solves
+- **Trade-offs** — design choices that have alternatives
+- **Constraints** — runtime invariants, ordering, lifecycle, side effects
+- **Non-obvious usage** — patterns the type allows but discourages, or shapes the caller is expected to follow
+
+Delete when JsDoc:
+
+- Restates the function name (`isJsonObject` → "Runtime type guard for a JSON object.")
+- Restates parameter or return types already in the signature
+- Says "Service token for monaco models" when the type is literally `Token<MonacoModelProvider, 'singleton'>`
+
+### `@example`
+
+Include when usage is not obvious from the signature. Examples must be copy-paste compilable — if you copy the block into a fresh `.ts` file and add the imports shown, `tsc --noEmit` passes. Drift is the main failure mode; treat examples as code, not prose.
+
+Cross-link instead of duplicating. Write `See {@link MonacoModelProvider} for active-model semantics` rather than re-explaining it on every consumer.
+
+### Cross-file `{@link}` references
+
+When a `{@link Symbol}` references a symbol declared in another file, add a type-only import for that symbol at the top of the referencing file:
+
+```typescript
+import type { MonacoModelProvider } from '../services/monaco-model-provider.js'
 ```
 
-## Summary
+TypeScript recognizes JsDoc references as usage (no `noUnusedLocals` complaint) and IDE navigation works. Type-only imports are erased under `verbatimModuleSyntax: true`, so circular type-only imports between two files are fine.
 
-**Key Principles:**
+### Example — value test in practice
 
-1. **Follow project's Prettier and ESLint configs**
-2. **Use consistent naming:**
-   - PascalCase: Components, classes, types
-   - camelCase: Functions, variables
-   - kebab-case: File names
-   - UPPER_SNAKE_CASE: Constants
-3. **Organize imports** by category with blank lines
-4. **Co-locate tests** with source files
-5. **Structure components** in directories when they have assets
+```typescript
+// ✅ keeps — explains intent + trade-off, irreplaceable by the type
+/**
+ * Schemas are cached by URL; the cache is process-lifetime since validators
+ * are pure and re-fetching adds latency on every editor change.
+ */
+const schemaCache = new Map<string, JsonSchema>()
 
-**Tools:**
+// ❌ deletes — narrates the type, no extra signal
+/**
+ * Runtime type guard for {@link JsonSchema}.
+ */
+export const isJsonSchema = (value: unknown): value is JsonSchema => { /* ... */ }
+```
 
-- Prettier: `yarn format`
-- ESLint: `yarn lint`
-- Type Check: `yarn build`
-- Unit Tests: `yarn test`
-- E2E Tests: `yarn test:e2e`
+## Comments
+
+Only for non-obvious intent / trade-offs / constraints. Never narrate what code does.
+
+```typescript
+// ✅
+// Exponential backoff: 1s, 2s, 4s, 8s, capped at 30s
+const delay = Math.min(1000 * 2 ** attempt, 30000)
+
+// ❌
+// Set count to 0
+const count = 0
+```
