@@ -1,12 +1,11 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import 'monaco-editor/esm/vs/editor/editor.main.js'
-
 import { ThemeProviderService } from '@furystack/shades-common-components'
+import 'monaco-editor/editor'
+import { editor } from 'monaco-editor/editor/editor.api'
+import 'monaco-editor/languages/features/json/register'
 import { ScrollService } from '../../services/scroll-service.js'
-import { darkTheme } from '../../themes/dark.js'
 import { orderFieldsAction } from './order-fields.js'
-import './worker-config.js'
+import { registerShadesTheme } from './register-shades-theme.js'
 
 export type MonacoDiffEditorProps = {
   options: editor.IStandaloneDiffEditorConstructionOptions
@@ -33,17 +32,19 @@ export const MonacoDiffEditor = Shade<MonacoDiffEditorProps>({
       queueMicrotask(() => {
         if (isDisposed || !containerRef.current) return
 
+        const themeName = registerShadesTheme({ themeProvider, editor })
         editorInstance = editor.createDiffEditor(containerRef.current, {
           ...props.options,
-          theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+          theme: themeName,
           smoothScrolling: true,
           scrollBeyondLastLine: false,
         })
 
         disposables.push(
           themeProvider.subscribe('themeChanged', () => {
+            const updatedThemeName = registerShadesTheme({ themeProvider, editor })
             editorInstance?.updateOptions({
-              theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
+              theme: updatedThemeName,
             } as editor.IStandaloneDiffEditorConstructionOptions)
           }),
         )

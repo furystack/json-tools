@@ -1,86 +1,82 @@
-import { Shade, createComponent } from '@furystack/shades'
-import type { Uri } from 'monaco-editor'
-import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import 'monaco-editor/esm/vs/editor/editor.main.js'
-
+import { createComponent, Shade } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
-import { ScrollService } from '../../services/scroll-service.js'
-import { darkTheme } from '../../themes/dark.js'
-import { orderFieldsAction } from './order-fields.js'
-import './worker-config.js'
+import 'monaco-editor/editor'
+import type { editor as editorTypes, Uri } from 'monaco-editor/editor'
+import { editor } from 'monaco-editor/editor/editor.api'
+import 'monaco-editor/languages/features/json/register'
+import { registerShadesTheme } from './register-shades-theme.js'
 
-export type MonacoEditorProps = {
+export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
   value?: string
   onValueChange?: (value: string) => void
+  onchange?: (value: string) => void
+  style?: Partial<CSSStyleDeclaration>
   modelUri?: Uri
 }
-
 export const MonacoEditor = Shade<MonacoEditorProps>({
   customElementName: 'monaco-editor',
-  render: ({ useRef, useDisposable, injector, props, useHostProps }) => {
-    const containerRef = useRef<HTMLDivElement>('container')
-    const themeProvider = injector.get(ThemeProviderService)
-    const scrollService = injector.get(ScrollService)
+  css: {
+    display: 'block',
+    height: '100%',
+    width: '100%',
+    position: 'relative',
+  },
+  render: ({ props, useDisposable, injector, useHostProps, useRef }) => {
+    const containerRef = useRef<HTMLDivElement>('editorContainer')
 
-    useHostProps({ style: { display: 'block', height: '100%' } })
+    if (props.style) {
+      useHostProps({ style: props.style as Record<string, string> })
+    }
 
-    useDisposable('editorLifecycle', () => {
-      let editorInstance: editor.IStandaloneCodeEditor | null = null
-      let isDisposed = false
-      const disposables: Array<{ [Symbol.dispose](): void }> = []
+    useDisposable('editor-init', () => {
+      let editorInstance: editorTypes.IStandaloneCodeEditor | undefined
+      let themeSub: Disposable | undefined
 
       queueMicrotask(() => {
-        if (isDisposed || !containerRef.current) return
+        if (!containerRef.current) return
+        const themeProvider = injector.get(ThemeProviderService)
+
+        const themeName = registerShadesTheme({ themeProvider, editor })
 
         editorInstance = editor.create(containerRef.current, {
+          theme: themeName,
           ...props.options,
-          theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
-          smoothScrolling: true,
-          scrollBeyondLastLine: false,
-        })
-
-        editorInstance.onDidScrollChange(() => {
-          scrollService.emit('onScroll', { top: editorInstance?.getScrollTop() === 0 })
-        })
-
-        disposables.push(
-          themeProvider.subscribe('themeChanged', () => {
-            editorInstance?.updateOptions({
-              theme: themeProvider.getAssignedTheme().name === darkTheme.name ? 'vs-dark' : 'vs-light',
-            })
-          }),
-        )
-
-        editorInstance.onDidChangeModelContent(() => {
-          props.onValueChange?.(editorInstance?.getValue() ?? '')
         })
 
         if (props.modelUri) {
-          const model = editor.createModel(props.value || '', 'json', props.modelUri)
-          editorInstance.setModel(model)
-          disposables.push({ [Symbol.dispose]: () => model.dispose() })
-        } else {
-          editorInstance.setValue(props.value || '')
+          editorInstance.setModel(editor.createModel(props.value || '', 'json', props.modelUri))
         }
 
-        editorInstance.addAction(orderFieldsAction)
-
-        const hostElement = containerRef.current.parentElement
-        if (hostElement) {
-          Object.assign(hostElement, { editorInstance })
+        editorInstance.setValue(props.value || '')
+        if (props.onchange) {
+          editorInstance.onKeyUp(() => {
+            const value = editorInstance!.getValue()
+            props.onchange?.(value)
+          })
         }
+
+        if (props.onValueChange) {
+          editorInstance.onDidChangeModelContent(() => {
+            const value = editorInstance!.getValue()
+            props.onValueChange?.(value)
+          })
+        }
+
+        themeSub = themeProvider.subscribe('themeChanged', () => {
+          const updatedName = registerShadesTheme({ themeProvider, editor })
+          editor.setTheme(updatedName)
+        })
       })
 
       return {
-        [Symbol.dispose]() {
-          isDisposed = true
-          disposables.forEach((d) => d[Symbol.dispose]())
+        [Symbol.dispose]: () => {
+          themeSub?.[Symbol.dispose]()
           editorInstance?.dispose()
         },
       }
     })
 
-    return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+    return <div ref={containerRef} data-spatial-nav-passthrough="" style={{ width: '100%', height: '100%' }} />
   },
 })

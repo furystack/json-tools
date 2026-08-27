@@ -1,5 +1,5 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
-import type { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
+import type { editor } from 'monaco-editor'
 import { MonacoDiffEditor } from '../components/monaco/monaco-diff-editor.js'
 import { ShareButton } from '../components/share-button.js'
 

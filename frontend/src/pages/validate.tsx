@@ -1,5 +1,5 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
-import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
+import { editor } from 'monaco-editor/editor/editor.api'
 import { JsonSchemaSelector } from '../components/json-schema-selector.js'
 import { MonacoEditor } from '../components/monaco/monaco-editor.js'
 import { ShareButton } from '../components/share-button.js'
