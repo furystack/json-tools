@@ -1,6 +1,6 @@
 import { defineService } from '@furystack/inject'
-import { Uri } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { json } from 'monaco-editor/esm/vs/editor/editor.main.js'
+import { Uri } from 'monaco-editor'
+import { jsonDefaults } from 'monaco-editor/languages/features/json/register'
 
 export const MonacoModelProvider = defineService({
   name: 'monacoModelProvider',
@@ -14,13 +14,13 @@ export const MonacoModelProvider = defineService({
           return nameUriCache.get(schemaName) as Uri
         }
         const modelUri = Uri.parse(`furystack://json-tools/model-schemas-${schemaName}.json`)
-        json.jsonDefaults.setDiagnosticsOptions({
+        jsonDefaults.setDiagnosticsOptions({
           validate: true,
           enableSchemaRequest: true,
           schemaRequest: 'warning',
           schemaValidation: 'error',
           schemas: [
-            ...(json.jsonDefaults.diagnosticsOptions.schemas || []),
+            ...(jsonDefaults.diagnosticsOptions.schemas || []),
             {
               uri: `furystack://json-tools/model-schemas-${schemaName}.json`,
               fileMatch: [modelUri.toString()],
